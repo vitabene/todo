@@ -1,0 +1,24 @@
+{
+  "name": "konnektodo",
+  "version": "0.0.0",
+  "description": "A to-do application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "browserify ./src/server.js --node -t [ babelify --presets [ es2015 react ] ] --outfile ./build/server.js"
+  },
+  "author": "Vita Benes",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "express": "~4.13.4",
+    "mongodb": "~2.1.20",
+    "co": "~4.6.0",
+    "binary-parser": "~1.1.5",
+    "bson": "~0.4.23"
+  },
+  "devDependencies": {
+    "babelify": "~7.3.0",
+    "babel-preset-es2015": "~6.9.0",
+    "babel-preset-react": "~6.5.0"
+  }
+}
