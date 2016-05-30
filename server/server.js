@@ -1,45 +1,52 @@
-// links
-// http://expressjs.com/en/starter/basic-routing.html
-// http://mongodb.github.io/node-mongodb-native/2.1/api/
-// http://www.tutorialspoint.com/mongodb/mongodb_data_modeling.htm
-// http://blog.modulus.io/mongodb-tutorial
-// http://stackoverflow.com/questions/34857782/cant-find-mongodb-collections-data
-// https://mongodb.github.io/node-mongodb-native/markdown-docs/queries.html
-
 var express = require('express'),
     MongoClient = require('mongodb').MongoClient,
-    assert = require('assert');
+    ObjectID = require('mongodb').ObjectID,
+    assert = require('assert'),
+    bodyParser = require('body-parser');
 
 var app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.db = {};
 
-// task - title, description, completed, lists - lists_id
-// list - title, description, tasks_id
+var url = 'mongodb://localhost:27017/konnektodo';
+MongoClient.connect(url, function (err, db) {
+  if (err) {
+    console.log('Unable to connect to the mongoDB server. Error:', err);
+  } else {
+    console.log('connected to:', url);
+    app.db = db;
+  }
+});
 
-var dbAction = function(callback) {
-  var url = 'mongodb://localhost:27017/konnektodo';
-  MongoClient.connect(url, function (err, db) {
-    if (err) {
-      console.log('Unable to connect to the mongoDB server. Error:', err);
-    } else {
-      console.log('connected to:', url);
-      app.db = db;
-      callback.call();
-    }
-  });
-};
+// task - title, desc, completed, lists - lists_id
+// list - title, desc, tasks_id
 
 app.get('/api/lists', function(req, res){
-  dbAction(function(){
     getLists(req,res);
-  });
+});
+
+app.get('/api/tasks', function(req, res){
+    getTasks(req,res);
+});
+
+app.post('/api/task/update', function(req, res){
+    updateTask(req,res);
 });
 
 var getLists = function(req, res){
   var col = app.db.collection('taskLists');
   col.find({}).toArray(function(err, items) {
     res.send(JSON.stringify(items));
-    app.db.close();
+  });
+};
+
+var getTasks = function(req, res){
+  var col = app.db.collection('tasks');
+  col.find({}).toArray(function(err, items) {
+    res.send(JSON.stringify(items));
   });
 };
 
@@ -47,9 +54,7 @@ var insertList = function(req, res) {
   var col = app.db.collection('taskLists');
   var list = req.body;
   col.insert(list, function(err, result) {
-    assert(null, err);
     res.send(JSON.stringify(result));
-    app.db.close();
   });
 };
 
@@ -65,17 +70,16 @@ var insertTask = function(req, res) {
   var col = app.db.collection('tasks');
   // get the object
   var task = req.body;
+  console.log(req.body);
+  task['completed'] = 0;
   var listIds = {};
   var id = {};
   // insert into tasks
   col.insert(task, function(err, result) {
-    assert(null, err);
-    id = result.id;
-    res.send(JSON.stringify(result));
-    app.db.close();
+    getTasks(req, res);
   });
   // update lists
-  var col = app.db.collection('taskLists');
+  // var col = app.db.collection('taskLists');
   // col.update(list, function(err, result) {
     // assert(null, err);
     // res.send(JSON.stringify(result));
@@ -83,26 +87,50 @@ var insertTask = function(req, res) {
   // });
 }
 
+var updateTask = function(req, res){
+  var col = app.db.collection('tasks');
+  var task = req.body;
+  // var listIds = {};
+  var id = new ObjectID(task._id);
+  // update task
+  col.update(
+    { _id: id},
+    { $set:{
+        title:task.title,
+        desc: task.desc,
+        completed: task.completed
+      }
+    },
+    {multi: true}, function(err, result) {
+      console.log(result.result);
+      getTasks(req,res);
+  });
+}
+
 app.delete('/list/:id', function (req, res) {
 
   res.send('Got a DELETE request at /list');
 });
 
-app.delete('/task/:id', function (req, res) {
-  res.send('Got a DELETE request at /task');
+app.delete('/api/task/delete', function (req, res) {
+  var col = app.db.collection('tasks');
+  var id = new ObjectID(req.body._id);
+  col.deleteMany({_id: id}, function(err, results) {
+        getTasks(req, res);
+      }
+  );
+  // res.send('Got a DELETE request at /task');
 });
 
 // inserting a task
-app.put('/task', function (req, res) {
-  dbAction(function(){
-    insertTask(req,res);
-  });
+app.post('/api/task/create', function(req, res) {
+  // dbAction(function(){
+    insertTask(req, res);
+  // });
 });
 
 app.get('/list/:id', function(){
-  dbAction(function(){
     getListTasks(req,res);
-  });
   // show the tasks associated to the list with id :id
 });
 

@@ -13,18 +13,30 @@ var API = {
 		data.id = data.id.trim();
 		if (data.id === '') return;
 		post('/api/task/update', {
-			id: data.id,
+			_id: data.id,
 			title: data.title,
-			description: data.description,
-			completed: "",
+			desc: data.description,
+			completed: data.completed,
 		}).then(actions.updatedTask.bind(actions));
+	},
+	deleteTask(id) {
+		id = id.trim();
+		if (id === '') return;
+		post('/api/task/delete', {
+			_id: id
+		}, 'DELETE').then(actions.deletedTask.bind(actions));
 	},
 	saveTask: function(title, desc) {
 		title = title.trim();
+		if (typeof desc === "undefined") desc = "";
 		desc = desc.trim();
 		if (title === '') return;
+		console.log({
+			title: title,
+			desc: desc
+		});
 		post('/api/task/create', {
-			title: text,
+			title: title,
 			desc: desc
 		}).then(actions.createdTask.bind(actions));
 	}
@@ -41,12 +53,11 @@ Dispatcher.register(function(action){
 		case constants.UPDATE_TASK:
 				API.updateTask(action.data);
 				break;
+		case constants.DELETE_TASK:
+				API.deleteTask(action.data);
+				break;
 	}
 });
-
-// function getRandomInt(min, max) {
-  // return Math.floor(Math.random() * (max - min)) + min;
-// }
 
 function get(url) {
 	return fetch(url, {
@@ -56,9 +67,10 @@ function get(url) {
 	});
 }
 
-function post(url, body) {
+function post(url, body, method) {
+	if (method == null) method = 'POST'
 	return fetch(url, {
-		method: 'POST',
+		method: method,
 		credentials: 'include',
 		body: JSON.stringify(body || {}),
 		headers: {

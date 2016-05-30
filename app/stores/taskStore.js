@@ -4,6 +4,8 @@ var TaskStore = module.exports = require('./store.js').extend({
 	init: function() {
 		this.bind(constants.GOT_TASKS, this.set);
 		this.bind(constants.CREATED_TASK, this.set);
+		this.bind(constants.UPDATED_TASK, this.set);
+		this.bind(constants.DELETED_TASK, this.set);
 	},
 	allIncomplete: function() {
 		var incompleteTasks = [];

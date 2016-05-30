@@ -8,45 +8,25 @@ class Home extends React.Component {
   constructor() {
     super();
     this.state = {
-      // tasks: TaskStore.all()
-      tasks: []
+      tasks: TaskStore.all()
     };
-  //   this.onChange = this.onChange.bind(this);
-  //   this.updateTask = this.updateTask.bind(this);
+    this.onChange = this.onChange.bind(this);
+    // this.updateTask = this.updateTask.bind(this);
   }
-  saveTask(title, desc) {
-  //     actions.createTask(title, desc);
+  componentDidMount() {
+    TaskStore.addChangeListener(this.onChange);
   }
-  updateTask(id, title, desc, completed) {
-  //     actions.updateTask({id: id, title: text, description: desc, completed: completed});
-  //     if (completed) {
-  //       var index = -1;
-  //       for (var i = 0; i < this.state.tasks.length; i++) {
-  //         var q = this.state.tasks[i];
-  //         if (id == q.id) index = this.state.tasks.indexOf(q)
-  //       }
-  //       if (index !== -1)
-  //       this.setState({
-  //         tasks: update(this.state.tasks, {$splice: [[index, 1]]})
-  //       })
-  //     }
+  componentWillUnmount() {
+    TaskStore.removeChangeListener(this.onChange);
   }
-  // componentDidMount() {
-  //   TaskStore.addChangeListener(this.onChange);
-  // }
-  // componentWillUnmount() {
-  //   TaskStore.removeChangeListener(this.onChange);
-  // }
-  // onChange() {
-  //   this.setState({
-  //     tasks: TaskStore.all()
-  //   });
-  // }
+  onChange() {
+    this.setState({
+      tasks: TaskStore.all()
+    });
+  }
   render() {
     return (
-        <TaskBoard addTask={this.saveTask}
-                    updateTask={this.updateTask}
-                    tasks={this.state.tasks}/>
+        <TaskBoard tasks={this.state.tasks}/>
     );
   }
 }

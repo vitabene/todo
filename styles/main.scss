@@ -66,6 +66,7 @@ a {
   background-color: #fff;
   & .task {
     overflow: auto;
+    position: relative;
     &__checkbox {
       width: 5%;
       height: 25px;
