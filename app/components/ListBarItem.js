@@ -11,19 +11,20 @@ class List extends React.Component {
     this.props.setActive(this.props.list._id)
   }
   deleteList(){
+    if(!confirm('Are you sure you want to delete this item?')) return false;
     actions.deleteList({
       _id: this.props.list._id,
       tasks: this.props.list.tasks
     });
   }
   render() {
+    let a = this.props.active ? "active" : "";
+    let listClass = "list " + a;
     return (
-      <li className="list" onClick={this.activate}>
+      <li className={listClass} onClick={this.activate}>
         <span className="list__title">{this.props.list.title}</span>
         <span className="list__desc">{this.props.list.desc}</span>
-        <button onClick={this.deleteList}>
-          Delete
-        </button>
+        <button className="list__del" onClick={this.deleteList}>X</button>
       </li>
     );
   }

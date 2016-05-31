@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import {browserHistory, Router, Route, IndexRoute, Link} from 'react-router'
 import App from './components/App'
 import Home from './components/Home'
+import Welcome from './components/Welcome'
 import Lists from './components/Lists'
 import ListDetail from './components/ListDetail'
 import TaskDetail from './components/TaskDetail'
@@ -15,7 +16,8 @@ API.fetchTasks();
 ReactDOM.render((
   <Router history={browserHistory}>
     <Route path="/" component={App}>
-      <IndexRoute component={Home}/>
+      <IndexRoute component={Welcome}/>
+        <Route path="tabs" component={Home}/>
         <Route path="lists" component={Lists}/>
         <Route path="/list/:id" component={ListDetail}/>
         <Route path="/task/:id" component={TaskDetail}/>

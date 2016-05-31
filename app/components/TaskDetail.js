@@ -3,6 +3,9 @@ import ListStore from '../stores/listStore'
 import TaskStore from '../stores/taskStore'
 import actions from '../actions'
 import {Link} from 'react-router'
+import EditDeleteButtons from './EditDeleteButtons'
+import CancelSaveButtons from './CancelSaveButtons'
+import CheckBox from './CheckBox'
 
 class TaskDetail extends React.Component {
   constructor() {
@@ -18,18 +21,19 @@ class TaskDetail extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.complete = this.complete.bind(this);
     this.edit = this.edit.bind(this);
-    // this.delete = this.delete.bind(this);
     this.cancelEdit = this.cancelEdit.bind(this);
     this.completeEdit = this.completeEdit.bind(this);
   }
   edit() {
-    // set
     this.setState({
       edited: true,
       title: this.state.task.title,
       desc: this.state.task.desc,
       editLists: this.state.task.lists.slice()
     });
+  }
+  deleteTask() {
+    actions.deleteTask(this.state.tast._id);
   }
   handleChange(e) {
     if (e.target.name === "title")
@@ -45,7 +49,6 @@ class TaskDetail extends React.Component {
       if (e.target.checked) {
         let eL = this.state.editLists.slice();
         eL.push(e.target.id);
-        console.log(eL);
         this.setState({
           editLists: eL
         });
@@ -60,7 +63,8 @@ class TaskDetail extends React.Component {
   }
   // should be toggle
   complete() {
-    this.props.update(this.state.id, this.state.title, this.state.desc, !this.state.task.comleted);
+    let t = this.state.task;
+    this.updateTask(t._id, t.title, t.desc, +!t.completed, t.lists);
   }
   cancelEdit() {
     this.setState({edited: false});
@@ -80,10 +84,8 @@ class TaskDetail extends React.Component {
       this.props.taskAdded();
     } else {
       this.updateTask(this.state.task._id,
-        this.state.title,
-        this.state.desc,
-        0,
-        this.state.editLists);
+        this.state.title, this.state.desc,
+        0, this.state.editLists);
     }
     this.setState({edited: false});
   }
@@ -103,17 +105,11 @@ class TaskDetail extends React.Component {
     });
   }
   render () {
-    let checked = false;
-    if (this.state.completed == 1) checked = true;
+    let checked = this.state.task.completed ? this.state.task.completed : '';
     let taskTitle = this.state.task.title ? this.state.task.title : '';
     let taskDesc = this.state.task.desc ? this.state.task.desc : '';
     var buttons = (
-      <div className="task__buttons">
-        <button className="task__edit-button"
-              onClick={this.edit}>Edit</button>
-        <button className="task__delete-button"
-              onClick={this.delete}>Delete</button>
-      </div>
+      <EditDeleteButtons edit={this.edit} delete={this.delete}/>
     );
 
     let lists = [];
@@ -127,32 +123,25 @@ class TaskDetail extends React.Component {
       taskDesc = this.state.desc;
       srcLists = this.state.editLists;
       buttons = (
-        <div className="task__buttons">
-          <button className="task__cancel-edit-button"
-                  onClick={this.cancelEdit}>Cancel</button>
-          <button className="task__complete-edit-button"
-                  onClick={this.completeEdit}>Save</button>
-        </div>
+        <CancelSaveButtons cancel={this.cancelEdit} save={this.completeEdit}/>
       );
     }
     for (var i = 0; i < st.allLists.length; i++) {
       let list = st.allLists[i];
       let listAssigned = srcLists.indexOf(list._id) !== -1 ? true : false;
       lists.push(
-        <li key={list._id}>
-          <input type="checkbox" disabled={!this.state.edited} className='list' id={list._id} checked={listAssigned}
+        <li className="task" key={list._id}>
+          <input type="checkbox" disabled={!this.state.edited}
+                  className='task__checkbox' id={list._id} checked={listAssigned}
                   onChange={this.handleChange}/>
           <span>{list.title}</span>
-          <Link to={`/list/${list._id}`}>Detail</Link>
+          <Link className="list-detail-link" to={`/list/${list._id}`}>Detail</Link>
         </li>
       );
     }
     return (
-      <div>
-        <input className="task__checkbox"
-              type="checkbox"
-              checked={checked}
-              onClick={this.complete}/>
+      <div className="task-detail">
+        <CheckBox checked={checked} click={this.complete}/>
         <input className="task__title"
               disabled={!this.state.edited}
               name="title"
@@ -165,7 +154,7 @@ class TaskDetail extends React.Component {
               value={taskDesc}/>
         {buttons}
         <h3>Lists</h3>
-        <ul>
+        <ul className="task-list">
           {lists}
         </ul>
       </div>

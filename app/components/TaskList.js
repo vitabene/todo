@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import Task from './Task'
+import TaskForm from './TaskForm'
 import actions from '../actions'
 import {Link} from 'react-router'
 
@@ -10,7 +10,6 @@ const newTask = {
 };
 
 class TaskList extends React.Component {
-  // tasks
   constructor() {
     super();
     this.state = {
@@ -38,13 +37,6 @@ class TaskList extends React.Component {
   deleteTask(id) {
     actions.deleteTask(id);
   }
-  updateTask(id, title, desc, completed) {
-    actions.updateTask({id: id,
-      title: title,
-      desc: desc,
-      completed: completed
-    });
-  }
   setFilter(e){
     this.setState({show: parseInt(e.target.name)});
   }
@@ -58,32 +50,38 @@ class TaskList extends React.Component {
       if (task.lists.indexOf(this.props.activeList) != -1) {
         // state matches filter or no filter set
         if (this.state.show === task.completed || this.state.show === 2) {
-          tasks.push(<li key={task._id}><Link to={`/task/${task._id}`}>{task.title}</Link></li>);
-          // tasks.push(<Task update={this.updateTask}
-          //                   delete={this.deleteTask}
-          //                   task={task}
-          //                   key={task._id}/>);
+          tasks.push(<li className="task" key={task._id}>
+            <Link to={`/task/${task._id}`}>{task.title}</Link>
+          </li>);
         }
       }
     };
+    // add task button
+    let addTaskButton = (<li className="task add" id="addTask"
+                              onClick={this.addTask}>+</li>);
     // adding tasks
     var emptyListBool = tasks.length === 0 && this.props.activeList !== 0;
     if (emptyListBool || this.state.addingTask) {
-      // tasks.push(<Task update={this.createTask}
-      //                   task={newTask}
-      //                   taskAdded={this.taskAdded}
-      //                   key={newTask._id}/>
-      // );
-      // tasks.push(<li><Link key={list._id} to={`/list/${list._id}`}>{list.title}</Link></li>);
+      tasks.push(<TaskForm createTask={this.createTask}
+                        task={newTask}
+                        taskAdded={this.taskAdded}
+                        key={newTask._id}/>
+      );
+      addTaskButton = (<li></li>);
     }
     return (
       <div className="task-list">
-        <input onClick={this.setFilter} name="1"  type="button" value="Show Complete"/>
-        <input onClick={this.setFilter} name="0"  type="button" value="Show Incomplete"/>
-        <input onClick={this.setFilter} name="2"  type="button" value="Show All"/>
+        <div className="task-filters">
+          <input onClick={this.setFilter} name="1"
+                type="button" value="Show Complete"/>
+          <input onClick={this.setFilter} name="0"
+                type="button" value="Show Incomplete"/>
+          <input onClick={this.setFilter} name="2"
+                type="button" value="Show All"/>
+        </div>
         <ul className="task-list" id="taskList">
           {tasks}
-          <li className="task add" id="addTask" onClick={this.addTask}>+</li>
+          {addTaskButton}
         </ul>
       </div>
     );

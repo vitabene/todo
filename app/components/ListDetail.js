@@ -34,14 +34,18 @@ class ListDetail extends React.Component {
     if (this.state.tasks.length > 0) {
       for (var i = 0; i < this.state.tasks.length; i++) {
         let task = this.state.tasks[i];
-        taskLinks.push(<Link key={task._id} to={`/task/${task._id}`}>{task.title}</Link>);
+        taskLinks.push(<li className="list">
+          <Link key={task._id} to={`/task/${task._id}`}>{task.title}</Link>
+        </li>);
       }
     }
     return (
-      <div>
+      <div className="list-detail">
         <h2>{listTitle}</h2>
         <small>{listDesc}</small>
-        {taskLinks}
+        <ul className="task-list">
+          {taskLinks}
+        </ul>
       </div>
     );
   }

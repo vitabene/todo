@@ -17,6 +17,7 @@ class Home extends React.Component {
     this.setActive = this.setActive.bind(this);
   }
   componentDidMount() {
+    this.onChange();
     TaskStore.addChangeListener(this.onChange);
     ListStore.addChangeListener(this.onChange);
   }

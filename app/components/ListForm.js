@@ -1,7 +1,6 @@
-import React, {
-  PropTypes
-} from 'react'
+import React, { PropTypes } from 'react'
 import actions from '../actions'
+import CancelSaveButtons from './CancelSaveButtons'
 
 const defaultList = {
   title: "Untitled List",
@@ -36,39 +35,23 @@ class ListForm extends React.Component {
     });
     this.props.detach();
   }
-  render() {
-    return ( < div className = "list-form" >
-      < input className = "list-title-field"
-      placeholder = {
-        defaultList.title
-      }
-      type = "text"
-      name = "title"
-      value = {
-        this.state.title
-      }
-      onChange = {
-        this.handleChange
-      }
-      /> < input className = "list-desc-field"
-      placeholder = {
-        defaultList.desc
-      }
-      type = "text"
-      name = "desc"
-      value = {
-        this.state.desc
-      }
-      onChange = {
-        this.handleChange
-      }
-      /> < button className = "list-create-button"
-      onClick = {
-        this.createList
-      } > Create List < /button> < button className = "list-create-button-cancel"
-      onClick = {
-        this.props.detach
-      } > Cancel < /button> < /div>
+  render () {
+    return (
+      <div className="list-form">
+        <input className="task__title"
+          placeholder={defaultList.title}
+          type="text"
+          name="title"
+          value={this.state.title}
+          onChange={this.handleChange}/>
+        <input className="task__desc"
+          placeholder={defaultList.desc}
+          type="text"
+          name="desc"
+          value={this.state.desc}
+          onChange={this.handleChange}/>
+        <CancelSaveButtons cancel={this.props.detach} save={this.createList}/>
+      </div>
     );
   }
 }

@@ -42,15 +42,15 @@ class ListBar extends React.Component {
                           active={listActive}
                           setActive={this.props.setActive}
                           key={list._id}/>);
+        listActive = false;
       };
     }
     let form = '';
     if (this.state.showForm) form = <ListForm detach={this.detachForm} />
     return (
-      <div>
+      <div className="list-bar">
         {form}
-        <Link to='lists'>All Lists</Link>
-        <ul className="list-bar" id="listBar">
+        <ul className="list-bar-list" id="listBar">
           {lists}
           <li className="list add" id="addList" onClick={this.attachForm}>+</li>
         </ul>
