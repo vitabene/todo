@@ -1,6 +1,7 @@
 import React from 'react'
 import ListStore from '../stores/listStore'
 import TaskStore from '../stores/taskStore'
+import {Link} from 'react-router'
 
 class ListDetail extends React.Component {
   constructor() {
@@ -27,11 +28,20 @@ class ListDetail extends React.Component {
     });
   }
   render () {
-    console.log(this.state.list);
-    console.log(this.state.tasks);
+    let listTitle = this.state.list.title ? this.state.list.title : '';
+    let listDesc = this.state.list.desc ? this.state.list.desc : '';
+    let taskLinks = [];
+    if (this.state.tasks.length > 0) {
+      for (var i = 0; i < this.state.tasks.length; i++) {
+        let task = this.state.tasks[i];
+        taskLinks.push(<Link key={task._id} to={`/task/${task._id}`}>{task.title}</Link>);
+      }
+    }
     return (
       <div>
-        {this.state.list.toString()}
+        <h2>{listTitle}</h2>
+        <small>{listDesc}</small>
+        {taskLinks}
       </div>
     );
   }

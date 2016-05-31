@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import ListBarItem from './ListBarItem'
 import actions from '../actions'
 
 const defaultList = {
@@ -12,8 +11,7 @@ class ListForm extends React.Component {
     super();
     this.state = {
       title: '',
-      desc: '',
-      addingList: false
+      desc: ''
     };
     this.handleChange = this.handleChange.bind(this);
     this.createList = this.createList.bind(this);
@@ -26,38 +24,32 @@ class ListForm extends React.Component {
       this.setState({desc: e.target.value});
     }
   }
-  addList(){
-    this.setState({addingList: true});
-  }
   createList() {
     actions.createList({
       title: this.state.title,
       desc: this.state.desc
     });
+    this.props.detach();
   }
-  // deleteList(id) {
-  //   actions.deleteList(id);
-  // }
-  // updateList(id, title, desc, completed) {
-  //   if (typeof desc === "undefined") desc = "";
-  //   console.log("taskUpdate", id, title, desc, completed);
-  //   actions.updateList({id: id, title: title, description: desc, completed: completed});
-  // }
   render () {
     return (
       <div className="list-form">
         <input className="list-title-field"
+          placeholder={defaultList.title}
           type="text"
           name="title"
           value={this.state.title}
           onChange={this.handleChange}/>
         <input className="list-desc-field"
+          placeholder={defaultList.desc}
           type="text"
           name="desc"
           value={this.state.desc}
           onChange={this.handleChange}/>
         <button className="list-create-button"
                 onClick={this.createList}>Create List</button>
+        <button className="list-create-button-cancel"
+                onClick={this.props.detach}>Cancel</button>
       </div>
     );
   }

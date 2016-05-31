@@ -5,6 +5,7 @@ import App from './components/App'
 import Home from './components/Home'
 import Lists from './components/Lists'
 import ListDetail from './components/ListDetail'
+import TaskDetail from './components/TaskDetail'
 import NoMatch from './components/NoMatch'
 import API from './api'
 
@@ -17,6 +18,7 @@ ReactDOM.render((
       <IndexRoute component={Home}/>
         <Route path="lists" component={Lists}/>
         <Route path="/list/:id" component={ListDetail}/>
+        <Route path="/task/:id" component={TaskDetail}/>
         <Route path="*" component={NoMatch}/>
     </Route>
   </Router>

@@ -25,6 +25,13 @@ var API = {
 			_id: id
 		}, 'DELETE').then(actions.deletedTask.bind(actions));
 	},
+	deleteList(data) {
+		if (data._id === '') return;
+		post('/api/list/delete', {
+			_id: data._id,
+			tasks: data.tasks
+		}, 'DELETE').then(actions.deletedList.bind(actions));
+	},
 	createTask: function(data) {
 		let title = data.title.trim();
 		if (typeof data.desc === "undefined") data.desc = "";

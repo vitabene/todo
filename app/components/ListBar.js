@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import {Link} from 'react-router'
+import ListForm from './ListForm'
 import ListBarItem from './ListBarItem'
 
 const defaultList = {
@@ -9,7 +10,24 @@ const defaultList = {
 };
 
 class ListBar extends React.Component {
-  // lists
+  constructor() {
+    super();
+    this.state = {
+      showForm: false
+    };
+    this.attachForm = this.attachForm.bind(this);
+    this.detachForm = this.detachForm.bind(this);
+  }
+  attachForm(){
+    this.setState({
+      showForm: true
+    });
+  }
+  detachForm(){
+    this.setState({
+      showForm: false
+    });
+  }
   render () {
     let lists = [],
         listActive = false;
@@ -26,12 +44,15 @@ class ListBar extends React.Component {
                           key={list._id}/>);
       };
     }
+    let form = '';
+    if (this.state.showForm) form = <ListForm detach={this.detachForm} />
     return (
       <div>
+        {form}
         <Link to='lists'>All Lists</Link>
         <ul className="list-bar" id="listBar">
           {lists}
-          <li className="list add" id="addList">+</li>
+          <li className="list add" id="addList" onClick={this.attachForm}>+</li>
         </ul>
       </div>
     );

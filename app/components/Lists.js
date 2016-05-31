@@ -29,13 +29,15 @@ class Lists extends React.Component {
     if (typeof this.state.lists != "undefined") {
       for (let i = 0; i < this.state.lists.length; i++) {
         let list = this.state.lists[i];
-        lists.push(<Link to={`/list/${list._id}`}>{list.title}</Link>);
+        lists.push(<li><Link key={list._id} to={`/list/${list._id}`}>{list.title}</Link></li>);
       };
     }
     return (
-      <div>
+      <div id="listsView">
         <ListForm />
-        {lists}
+        <ul className="task-lists">
+          {lists}
+        </ul>
       </div>
     );
   }

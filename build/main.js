@@ -75,6 +75,10 @@
 	
 	var _ListDetail2 = _interopRequireDefault(_ListDetail);
 	
+	var _TaskDetail = __webpack_require__(/*! ./components/TaskDetail */ 269);
+	
+	var _TaskDetail2 = _interopRequireDefault(_TaskDetail);
+	
 	var _NoMatch = __webpack_require__(/*! ./components/NoMatch */ 252);
 	
 	var _NoMatch2 = _interopRequireDefault(_NoMatch);
@@ -97,6 +101,7 @@
 	    _react2.default.createElement(_reactRouter.IndexRoute, { component: _Home2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'lists', component: _Lists2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: '/list/:id', component: _ListDetail2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: '/task/:id', component: _TaskDetail2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: '*', component: _NoMatch2.default })
 	  )
 	), document.getElementById('app'));
@@ -26635,10 +26640,6 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _actions = __webpack_require__(/*! ../actions */ 231);
-	
-	var _actions2 = _interopRequireDefault(_actions);
-	
 	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 237);
 	
 	var _taskStore2 = _interopRequireDefault(_taskStore);
@@ -26723,7 +26724,6 @@
 	      return _react2.default.createElement(
 	        'div',
 	        null,
-	        _react2.default.createElement(_ListForm2.default, null),
 	        _react2.default.createElement(_ListBar2.default, { activeList: this.state.activeList,
 	          setActive: this.setActive,
 	          lists: this.state.lists }),
@@ -27730,6 +27730,7 @@
 	    _this.addTask = _this.addTask.bind(_this);
 	    _this.taskAdded = _this.taskAdded.bind(_this);
 	    _this.createTask = _this.createTask.bind(_this);
+	    _this.setFilter = _this.setFilter.bind(_this);
 	    return _this;
 	  }
 	
@@ -27749,7 +27750,8 @@
 	      _actions2.default.createTask({
 	        title: title,
 	        desc: desc,
-	        lists: [this.props.activeList]
+	        lists: [this.props.activeList],
+	        show: 2
 	      });
 	    }
 	  }, {
@@ -27767,20 +27769,29 @@
 	      });
 	    }
 	  }, {
+	    key: 'setFilter',
+	    value: function setFilter(e) {
+	      this.setState({ show: parseInt(e.target.name) });
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var tasks = [];
-	      if (typeof this.props.tasks != "undefined") {
-	        for (var i = this.props.tasks.length - 1; i >= 0; i--) {
-	          var task = this.props.tasks[i];
-	          if (task.lists.indexOf(this.props.activeList) != -1) {
+	      if (typeof this.props.tasks === "undefined") return;
+	      // reverse order
+	      for (var i = this.props.tasks.length - 1; i >= 0; i--) {
+	        var task = this.props.tasks[i];
+	        // show only tasks from the active list
+	        if (task.lists.indexOf(this.props.activeList) != -1) {
+	          // state matches filter or no filter set
+	          if (this.state.show === task.completed || this.state.show === 2) {
 	            tasks.push(_react2.default.createElement(_Task2.default, { update: this.updateTask,
 	              'delete': this.deleteTask,
 	              task: task,
 	              key: task._id }));
 	          }
-	        };
-	      }
+	        }
+	      };
 	      // adding tasks
 	      var emptyListBool = tasks.length === 0 && this.props.activeList !== 0;
 	      if (emptyListBool || this.state.addingTask) {
@@ -27790,13 +27801,20 @@
 	          key: newTask._id }));
 	      }
 	      return _react2.default.createElement(
-	        'ul',
-	        { className: 'task-list', id: 'taskList' },
-	        tasks,
+	        'div',
+	        { className: 'task-list' },
+	        _react2.default.createElement('input', { onClick: this.setFilter, name: '1', type: 'button', value: 'Show Complete' }),
+	        _react2.default.createElement('input', { onClick: this.setFilter, name: '0', type: 'button', value: 'Show Incomplete' }),
+	        _react2.default.createElement('input', { onClick: this.setFilter, name: '2', type: 'button', value: 'Show All' }),
 	        _react2.default.createElement(
-	          'li',
-	          { className: 'task add', id: 'addTask', onClick: this.addTask },
-	          '+'
+	          'ul',
+	          { className: 'task-list', id: 'taskList' },
+	          tasks,
+	          _react2.default.createElement(
+	            'li',
+	            { className: 'task add', id: 'addTask', onClick: this.addTask },
+	            '+'
+	          )
 	        )
 	      );
 	    }
@@ -27993,6 +28011,10 @@
 	
 	var _reactRouter = __webpack_require__(/*! react-router */ 168);
 	
+	var _ListForm = __webpack_require__(/*! ./ListForm */ 249);
+	
+	var _ListForm2 = _interopRequireDefault(_ListForm);
+	
 	var _ListBarItem = __webpack_require__(/*! ./ListBarItem */ 267);
 	
 	var _ListBarItem2 = _interopRequireDefault(_ListBarItem);
@@ -28017,13 +28039,32 @@
 	  function ListBar() {
 	    _classCallCheck(this, ListBar);
 	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(ListBar).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ListBar).call(this));
+	
+	    _this.state = {
+	      showForm: false
+	    };
+	    _this.attachForm = _this.attachForm.bind(_this);
+	    _this.detachForm = _this.detachForm.bind(_this);
+	    return _this;
 	  }
 	
 	  _createClass(ListBar, [{
+	    key: 'attachForm',
+	    value: function attachForm() {
+	      this.setState({
+	        showForm: true
+	      });
+	    }
+	  }, {
+	    key: 'detachForm',
+	    value: function detachForm() {
+	      this.setState({
+	        showForm: false
+	      });
+	    }
+	  }, {
 	    key: 'render',
-	
-	    // lists
 	    value: function render() {
 	      var lists = [],
 	          listActive = false;
@@ -28040,9 +28081,12 @@
 	            key: list._id }));
 	        };
 	      }
+	      var form = '';
+	      if (this.state.showForm) form = _react2.default.createElement(_ListForm2.default, { detach: this.detachForm });
 	      return _react2.default.createElement(
 	        'div',
 	        null,
+	        form,
 	        _react2.default.createElement(
 	          _reactRouter.Link,
 	          { to: 'lists' },
@@ -28054,7 +28098,7 @@
 	          lists,
 	          _react2.default.createElement(
 	            'li',
-	            { className: 'list add', id: 'addList' },
+	            { className: 'list add', id: 'addList', onClick: this.attachForm },
 	            '+'
 	          )
 	        )
@@ -28119,6 +28163,13 @@
 			post('/api/task/delete', {
 				_id: id
 			}, 'DELETE').then(_actions2.default.deletedTask.bind(_actions2.default));
+		},
+		deleteList: function deleteList(data) {
+			if (data._id === '') return;
+			post('/api/list/delete', {
+				_id: data._id,
+				tasks: data.tasks
+			}, 'DELETE').then(_actions2.default.deletedList.bind(_actions2.default));
 		},
 	
 		createTask: function createTask(data) {
@@ -28213,10 +28264,6 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _ListBarItem = __webpack_require__(/*! ./ListBarItem */ 267);
-	
-	var _ListBarItem2 = _interopRequireDefault(_ListBarItem);
-	
 	var _actions = __webpack_require__(/*! ../actions */ 231);
 	
 	var _actions2 = _interopRequireDefault(_actions);
@@ -28244,8 +28291,7 @@
 	
 	    _this.state = {
 	      title: '',
-	      desc: '',
-	      addingList: false
+	      desc: ''
 	    };
 	    _this.handleChange = _this.handleChange.bind(_this);
 	    _this.createList = _this.createList.bind(_this);
@@ -28262,27 +28308,14 @@
 	      }
 	    }
 	  }, {
-	    key: 'addList',
-	    value: function addList() {
-	      this.setState({ addingList: true });
-	    }
-	  }, {
 	    key: 'createList',
 	    value: function createList() {
 	      _actions2.default.createList({
 	        title: this.state.title,
 	        desc: this.state.desc
 	      });
+	      this.props.detach();
 	    }
-	    // deleteList(id) {
-	    //   actions.deleteList(id);
-	    // }
-	    // updateList(id, title, desc, completed) {
-	    //   if (typeof desc === "undefined") desc = "";
-	    //   console.log("taskUpdate", id, title, desc, completed);
-	    //   actions.updateList({id: id, title: title, description: desc, completed: completed});
-	    // }
-	
 	  }, {
 	    key: 'render',
 	    value: function render() {
@@ -28290,11 +28323,13 @@
 	        'div',
 	        { className: 'list-form' },
 	        _react2.default.createElement('input', { className: 'list-title-field',
+	          placeholder: defaultList.title,
 	          type: 'text',
 	          name: 'title',
 	          value: this.state.title,
 	          onChange: this.handleChange }),
 	        _react2.default.createElement('input', { className: 'list-desc-field',
+	          placeholder: defaultList.desc,
 	          type: 'text',
 	          name: 'desc',
 	          value: this.state.desc,
@@ -28304,6 +28339,12 @@
 	          { className: 'list-create-button',
 	            onClick: this.createList },
 	          'Create List'
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { className: 'list-create-button-cancel',
+	            onClick: this.props.detach },
+	          'Cancel'
 	        )
 	      );
 	    }
@@ -28331,6 +28372,12 @@
 			this.bind(constants.CREATED_LIST, this.set);
 			this.bind(constants.UPDATED_LIST, this.set);
 			this.bind(constants.DELETED_LIST, this.set);
+		},
+		getByIds: function getByIds(id) {
+			return this._data.filter(function (item) {
+				// if list not empty
+				if (typeof item.tasks !== "undefined") return item.tasks.indexOf(id) !== -1;
+			});
 		}
 	});
 
@@ -28419,17 +28466,25 @@
 	        for (var i = 0; i < this.state.lists.length; i++) {
 	          var list = this.state.lists[i];
 	          lists.push(_react2.default.createElement(
-	            _reactRouter.Link,
-	            { to: '/list/' + list._id },
-	            list.title
+	            'li',
+	            null,
+	            _react2.default.createElement(
+	              _reactRouter.Link,
+	              { key: list._id, to: '/list/' + list._id },
+	              list.title
+	            )
 	          ));
 	        };
 	      }
 	      return _react2.default.createElement(
 	        'div',
-	        null,
+	        { id: 'listsView' },
 	        _react2.default.createElement(_ListForm2.default, null),
-	        lists
+	        _react2.default.createElement(
+	          'ul',
+	          { className: 'task-lists' },
+	          lists
+	        )
 	      );
 	    }
 	  }]);
@@ -28512,7 +28567,7 @@
   \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -28523,6 +28578,10 @@
 	var _react = __webpack_require__(/*! react */ 1);
 	
 	var _react2 = _interopRequireDefault(_react);
+	
+	var _actions = __webpack_require__(/*! ../actions */ 231);
+	
+	var _actions2 = _interopRequireDefault(_actions);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28541,29 +28600,43 @@
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(List).call(this));
 	
 	    _this.activate = _this.activate.bind(_this);
+	    _this.deleteList = _this.deleteList.bind(_this);
 	    return _this;
 	  }
 	
 	  _createClass(List, [{
-	    key: "activate",
+	    key: 'activate',
 	    value: function activate() {
 	      this.props.setActive(this.props.list._id);
 	    }
 	  }, {
-	    key: "render",
+	    key: 'deleteList',
+	    value: function deleteList() {
+	      _actions2.default.deleteList({
+	        _id: this.props.list._id,
+	        tasks: this.props.list.tasks
+	      });
+	    }
+	  }, {
+	    key: 'render',
 	    value: function render() {
 	      return _react2.default.createElement(
-	        "li",
-	        { className: "list", onClick: this.activate },
+	        'li',
+	        { className: 'list', onClick: this.activate },
 	        _react2.default.createElement(
-	          "span",
-	          { className: "list__title" },
+	          'span',
+	          { className: 'list__title' },
 	          this.props.list.title
 	        ),
 	        _react2.default.createElement(
-	          "span",
-	          { className: "list__desc" },
+	          'span',
+	          { className: 'list__desc' },
 	          this.props.list.desc
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { onClick: this.deleteList },
+	          'Delete'
 	        )
 	      );
 	    }
@@ -28600,6 +28673,8 @@
 	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 237);
 	
 	var _taskStore2 = _interopRequireDefault(_taskStore);
+	
+	var _reactRouter = __webpack_require__(/*! react-router */ 168);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28649,12 +28724,33 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      console.log(this.state.list);
-	      console.log(this.state.tasks);
+	      var listTitle = this.state.list.title ? this.state.list.title : '';
+	      var listDesc = this.state.list.desc ? this.state.list.desc : '';
+	      var taskLinks = [];
+	      if (this.state.tasks.length > 0) {
+	        for (var i = 0; i < this.state.tasks.length; i++) {
+	          var task = this.state.tasks[i];
+	          taskLinks.push(_react2.default.createElement(
+	            _reactRouter.Link,
+	            { key: task._id, to: '/task/' + task._id },
+	            task.title
+	          ));
+	        }
+	      }
 	      return _react2.default.createElement(
 	        'div',
 	        null,
-	        this.state.list.toString()
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          listTitle
+	        ),
+	        _react2.default.createElement(
+	          'small',
+	          null,
+	          listDesc
+	        ),
+	        taskLinks
 	      );
 	    }
 	  }]);
@@ -28663,6 +28759,118 @@
 	}(_react2.default.Component);
 	
 	exports.default = ListDetail;
+
+/***/ },
+/* 269 */
+/*!**************************************!*\
+  !*** ./app/components/TaskDetail.js ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 250);
+	
+	var _listStore2 = _interopRequireDefault(_listStore);
+	
+	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 237);
+	
+	var _taskStore2 = _interopRequireDefault(_taskStore);
+	
+	var _reactRouter = __webpack_require__(/*! react-router */ 168);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var TaskDetail = function (_React$Component) {
+	  _inherits(TaskDetail, _React$Component);
+	
+	  function TaskDetail() {
+	    _classCallCheck(this, TaskDetail);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TaskDetail).call(this));
+	
+	    _this.state = {
+	      task: {}
+	    };
+	    _this.onChange = _this.onChange.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(TaskDetail, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.onChange();
+	      _taskStore2.default.addChangeListener(this.onChange);
+	      _listStore2.default.addChangeListener(this.onChange);
+	    }
+	  }, {
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {
+	      _taskStore2.default.removeChangeListener(this.onChange);
+	      _listStore2.default.removeChangeListener(this.onChange);
+	    }
+	  }, {
+	    key: 'onChange',
+	    value: function onChange() {
+	      this.setState({
+	        task: _taskStore2.default.get(this.props.params.id),
+	        lists: _listStore2.default.getByIds(this.props.params.id)
+	      });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var taskTitle = this.state.task.title ? this.state.task.title : '';
+	      var taskDesc = this.state.task.desc ? this.state.task.desc : '';
+	      var lists = [];
+	      if (typeof this.state.lists !== "undefined" && this.state.lists.length > 0) {
+	        for (var i = 0; i < this.state.lists.length; i++) {
+	          var list = this.state.lists[i];
+	          lists.push(_react2.default.createElement(
+	            _reactRouter.Link,
+	            { key: list._id, to: '/list/' + list._id },
+	            list.title
+	          ));
+	        }
+	      }
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          taskTitle
+	        ),
+	        _react2.default.createElement(
+	          'small',
+	          null,
+	          taskDesc
+	        ),
+	        lists
+	      );
+	    }
+	  }]);
+	
+	  return TaskDetail;
+	}(_react2.default.Component);
+	
+	exports.default = TaskDetail;
 
 /***/ }
 /******/ ]);

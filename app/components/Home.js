@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import actions from '../actions'
 import TaskStore from '../stores/taskStore'
 import ListStore from '../stores/listStore'
 import TaskList from './TaskList'
@@ -44,7 +43,6 @@ class Home extends React.Component {
   render() {
     return (
       <div>
-        <ListForm />
         <ListBar activeList={this.state.activeList}
                 setActive={this.setActive}
                 lists={this.state.lists}/>

@@ -54,34 +54,38 @@ var insertTask = function(req, res) {
     task.lists[i] = new ObjectID(task.lists[i]);
   var id = {};
   app.tasks.insert(task, function(err, result) {
-    getTasks(req, res);
+    app.lists.update(
+      {_id: task.lists[0]},
+      {$push: {tasks: task._id}},
+      {multi: true}, function(err, result) {
+        getTasks(req,res);
+    });
   });
-}
+};
 
 var deleteTask = function(req, res) {
   var id = new ObjectID(req.body._id);
   app.tasks.deleteOne({_id: id}, function(err, results) {
         getTasks(req, res);
   });
-}
+};
 
 var updateTask = function(req, res){
   var task = req.body;
-  // var listIds = {};
   var id = new ObjectID(task._id);
-  // update task
   app.tasks.update(
     { _id: id},
     { $set:{
         title:task.title,
         desc: task.desc,
-        completed: task.completed
+        completed: task.completed,
+        lists: task.lists
       }
     },
     {multi: true}, function(err, result) {
       getTasks(req,res);
   });
-}
+};
 
 app.get('/api/lists', function(req, res){
   getLists(req,res);
@@ -129,19 +133,16 @@ var updateList = function(req, res) {
   });
 };
 
-var deleteList = function(reg, res) {
-  var id = new ObjectID(req.body._id);
-  app.lists.deleteOne({_id: id}, function(err, results) {
+var deleteList = function(req, res) {
+  var _id = new ObjectID(req.body._id),
+      tasksIds = req.body.tasks;
+  if (typeof tasksIds !== "undefined") {
+    // delete tasks belonging only to the list
+    app.tasks.deleteMany({lists: _id});
+  }
+  app.lists.deleteOne({_id: _id}, function(err, results) {
     getLists(req, res);
   });
-}
-
-var getListTasks = function(id){
-  // get task associated with a list
-  // col.find({}).toArray(function(err, items) {
-    // res.send(JSON.stringify(items));
-    // app.db.close();
-  // });
 };
 
 app.use(express.static('./build')).listen(3000);
