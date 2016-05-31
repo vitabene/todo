@@ -9,7 +9,6 @@ class Task extends React.Component {
       desc: '',
       id: ''
     };
-    this.updateValue = this.updateValue.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.complete = this.complete.bind(this);
     this.edit = this.edit.bind(this);
@@ -22,9 +21,6 @@ class Task extends React.Component {
   }
   handleChange(e){
     this.setState({title: e.target.value});
-  }
-  updateValue(title, desc){
-    this.setState({title: title, desc: desc});
   }
   // should be toggle
   complete() {
@@ -85,6 +81,7 @@ class Task extends React.Component {
               disabled={!this.state.edited}
               onChange={this.handleChange}
               value={this.state.title}/>
+              
         {buttons}
       </li>
     );

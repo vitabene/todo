@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import Task from './Task'
 import actions from '../actions'
+import {Link} from 'react-router'
 
 const newTask = {
   _id: 0,
@@ -13,7 +14,8 @@ class TaskList extends React.Component {
   constructor() {
     super();
     this.state = {
-      addingTask: false
+      addingTask: false,
+      show: 2
     };
     this.addTask = this.addTask.bind(this);
     this.taskAdded = this.taskAdded.bind(this);
@@ -30,8 +32,7 @@ class TaskList extends React.Component {
     actions.createTask({
       title: title,
       desc: desc,
-      lists: [this.props.activeList],
-      show: 2
+      lists: [this.props.activeList]
     });
   }
   deleteTask(id) {
@@ -57,21 +58,23 @@ class TaskList extends React.Component {
       if (task.lists.indexOf(this.props.activeList) != -1) {
         // state matches filter or no filter set
         if (this.state.show === task.completed || this.state.show === 2) {
-          tasks.push(<Task update={this.updateTask}
-                            delete={this.deleteTask}
-                            task={task}
-                            key={task._id}/>);
+          tasks.push(<li key={task._id}><Link to={`/task/${task._id}`}>{task.title}</Link></li>);
+          // tasks.push(<Task update={this.updateTask}
+          //                   delete={this.deleteTask}
+          //                   task={task}
+          //                   key={task._id}/>);
         }
       }
     };
     // adding tasks
     var emptyListBool = tasks.length === 0 && this.props.activeList !== 0;
     if (emptyListBool || this.state.addingTask) {
-      tasks.push(<Task update={this.createTask}
-                        task={newTask}
-                        taskAdded={this.taskAdded}
-                        key={newTask._id}/>
-      );
+      // tasks.push(<Task update={this.createTask}
+      //                   task={newTask}
+      //                   taskAdded={this.taskAdded}
+      //                   key={newTask._id}/>
+      // );
+      // tasks.push(<li><Link key={list._id} to={`/list/${list._id}`}>{list.title}</Link></li>);
     }
     return (
       <div className="task-list">

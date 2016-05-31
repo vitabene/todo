@@ -10,14 +10,7 @@ var API = {
 		get('/api/tasks').then(actions.gotTasks.bind(actions));
 	},
 	updateTask(data) {
-		data.id = data.id.trim();
-		if (data.id === '') return;
-		post('/api/task/update', {
-			_id: data.id,
-			title: data.title,
-			desc: data.desc,
-			completed: data.completed,
-		}).then(actions.updatedTask.bind(actions));
+		post('/api/task/update', data).then(actions.updatedTask.bind(actions));
 	},
 	deleteTask(id) {
 		if (id === '') return;

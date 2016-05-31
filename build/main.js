@@ -67,23 +67,23 @@
 	
 	var _Home2 = _interopRequireDefault(_Home);
 	
-	var _Lists = __webpack_require__(/*! ./components/Lists */ 251);
+	var _Lists = __webpack_require__(/*! ./components/Lists */ 247);
 	
 	var _Lists2 = _interopRequireDefault(_Lists);
 	
-	var _ListDetail = __webpack_require__(/*! ./components/ListDetail */ 268);
+	var _ListDetail = __webpack_require__(/*! ./components/ListDetail */ 248);
 	
 	var _ListDetail2 = _interopRequireDefault(_ListDetail);
 	
-	var _TaskDetail = __webpack_require__(/*! ./components/TaskDetail */ 269);
+	var _TaskDetail = __webpack_require__(/*! ./components/TaskDetail */ 249);
 	
 	var _TaskDetail2 = _interopRequireDefault(_TaskDetail);
 	
-	var _NoMatch = __webpack_require__(/*! ./components/NoMatch */ 252);
+	var _NoMatch = __webpack_require__(/*! ./components/NoMatch */ 250);
 	
 	var _NoMatch2 = _interopRequireDefault(_NoMatch);
 	
-	var _api = __webpack_require__(/*! ./api */ 248);
+	var _api = __webpack_require__(/*! ./api */ 251);
 	
 	var _api2 = _interopRequireDefault(_api);
 	
@@ -26640,15 +26640,15 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 237);
+	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 231);
 	
 	var _taskStore2 = _interopRequireDefault(_taskStore);
 	
-	var _listStore = __webpack_require__(/*! ../stores/listStore */ 250);
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 240);
 	
 	var _listStore2 = _interopRequireDefault(_listStore);
 	
-	var _TaskList = __webpack_require__(/*! ./TaskList */ 242);
+	var _TaskList = __webpack_require__(/*! ./TaskList */ 241);
 	
 	var _TaskList2 = _interopRequireDefault(_TaskList);
 	
@@ -26656,7 +26656,7 @@
 	
 	var _ListBar2 = _interopRequireDefault(_ListBar);
 	
-	var _ListForm = __webpack_require__(/*! ./ListForm */ 249);
+	var _ListForm = __webpack_require__(/*! ./ListForm */ 245);
 	
 	var _ListForm2 = _interopRequireDefault(_ListForm);
 	
@@ -26739,38 +26739,165 @@
 
 /***/ },
 /* 231 */
-/*!************************!*\
-  !*** ./app/actions.js ***!
-  \************************/
+/*!*********************************!*\
+  !*** ./app/stores/taskStore.js ***!
+  \*********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var _dispatcher = __webpack_require__(/*! ./dispatcher */ 232);
+	var constants = __webpack_require__(/*! ../constants */ 232);
+	
+	var TaskStore = module.exports = __webpack_require__(/*! ./store.js */ 233).extend({
+		init: function init() {
+			this.bind(constants.GOT_TASKS, this.set);
+			this.bind(constants.CREATED_TASK, this.set);
+			this.bind(constants.UPDATED_TASK, this.set);
+			this.bind(constants.DELETED_TASK, this.set);
+		},
+		allIncomplete: function allIncomplete() {
+			var incompleteTasks = [];
+			for (var i = 0; i < this._data.length; i++) {
+				if (this._data[i].completed == 0) incompleteTasks.push(this._data[i]);
+				// this._data[i].completed ? "" : incompleteTasks.push(this._data[i])
+			}
+			return incompleteTasks;
+			// return this._data.filter(function(task) {
+			// return task.completed == 0;
+			// });
+		},
+		getByListId: function getByListId(id) {
+			var listTasks = [];
+			return this._data.filter(function (task) {
+				return task.lists.indexOf(id) !== -1;
+			});
+		}
+	});
+
+/***/ },
+/* 232 */
+/*!**************************!*\
+  !*** ./app/constants.js ***!
+  \**************************/
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = {
+	  CREATE_TASK: 'CREATE_TASK',
+	  CREATED_TASK: 'CREATED_TASK',
+	
+	  UPDATE_TASK: 'UPDATE_TASK',
+	  UPDATED_TASK: 'UPDATED_TASK',
+	
+	  COMPLETE_TASK: 'COMPLETE_TASK',
+	  COMPLETED_TASK: 'COMPLETED_TASK',
+	
+	  DELETE_TASK: 'DELETE_TASK',
+	  DELETED_TASK: 'DELETED_TASK',
+	
+	  GOT_TASKS: 'GOT_TASKS',
+	
+	  CREATE_LIST: 'CREATE_LIST',
+	  CREATED_LIST: 'CREATED_LIST',
+	
+	  UPDATE_LIST: 'UPDATE_LIST',
+	  UPDATED_LIST: 'UPDATED_LIST',
+	
+	  DELETE_LIST: 'DELETE_LIST',
+	  DELETED_LIST: 'DELETED_LIST',
+	
+	  GOT_LISTS: 'GOT_LISTS'
+	};
+
+/***/ },
+/* 233 */
+/*!*****************************!*\
+  !*** ./app/stores/store.js ***!
+  \*****************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _dispatcher = __webpack_require__(/*! ../dispatcher */ 234);
 	
 	var _dispatcher2 = _interopRequireDefault(_dispatcher);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var constants = __webpack_require__(/*! ./constants */ 236);
+	var assign = __webpack_require__(/*! object-assign */ 238);
+	var EventEmitterProto = __webpack_require__(/*! events */ 239).EventEmitter.prototype;
+	var CHANGE_EVENT = 'CHANGE';
 	
-	// generating functions for actions
-	Object.keys(constants).forEach(function (key) {
-		var funcName = key.split('_').map(function (word, i) {
-			if (i === 0) return word.toLowerCase();
-			return word[0] + word.slice(1).toLowerCase();
-		}).join('');
 	
-		exports[funcName] = function (data) {
-			_dispatcher2.default.dispatch({
-				actionType: constants[key],
-				data: data
+	var storeMethods = {
+		init: function init() {},
+		set: function set(arr) {
+			if (arr === null) {
+				console.log("data for store " + this.constructor.name + " is null");
+				return;
+			}
+			this._data = arr;
+		},
+		add: function add(item) {
+			this._data.push(item);
+			this.sort();
+		},
+		sort: function sort() {
+			this._data.sort(function (a, b) {
+				return +new Date(b.created) - +new Date(a.created);
 			});
+		},
+		all: function all() {
+			return this._data;
+		},
+		get: function get(id) {
+			return this._data.filter(function (item) {
+				return item._id === id;
+			})[0];
+		},
+		addChangeListener: function addChangeListener(fn) {
+			this.on(CHANGE_EVENT, fn);
+		},
+		removeChangeListener: function removeChangeListener(fn) {
+			this.removeListener(CHANGE_EVENT, fn);
+		},
+		emitChange: function emitChange() {
+			this.emit(CHANGE_EVENT);
+		},
+		bind: function bind(actionType, actionFn) {
+			if (this.actions[actionType]) {
+				this.actions[actionType].push(actionFn);
+			} else {
+				this.actions[actionType] = [actionFn];
+			}
+		}
+	};
+	
+	exports.extend = function (methods) {
+		var store = {
+			_data: [],
+			actions: {}
 		};
-	});
+	
+		assign(store, EventEmitterProto, storeMethods, methods);
+	
+		store.init();
+	
+		_dispatcher2.default.register(function (action) {
+			if (store.actions[action.actionType]) {
+				store.actions[action.actionType].forEach(function (fn) {
+					fn.call(store, action.data);
+					store.emitChange();
+				});
+			}
+		});
+	
+		return store;
+	};
 
 /***/ },
-/* 232 */
+/* 234 */
 /*!***************************!*\
   !*** ./app/dispatcher.js ***!
   \***************************/
@@ -26782,7 +26909,7 @@
 		value: true
 	});
 	
-	var _flux = __webpack_require__(/*! flux */ 233);
+	var _flux = __webpack_require__(/*! flux */ 235);
 	
 	var _flux2 = _interopRequireDefault(_flux);
 	
@@ -26798,7 +26925,7 @@
 	exports.default = Dispatcher;
 
 /***/ },
-/* 233 */
+/* 235 */
 /*!*************************!*\
   !*** ./~/flux/index.js ***!
   \*************************/
@@ -26813,11 +26940,11 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 	
-	module.exports.Dispatcher = __webpack_require__(/*! ./lib/Dispatcher */ 234);
+	module.exports.Dispatcher = __webpack_require__(/*! ./lib/Dispatcher */ 236);
 
 
 /***/ },
-/* 234 */
+/* 236 */
 /*!**********************************!*\
   !*** ./~/flux/lib/Dispatcher.js ***!
   \**********************************/
@@ -26842,7 +26969,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var invariant = __webpack_require__(/*! fbjs/lib/invariant */ 235);
+	var invariant = __webpack_require__(/*! fbjs/lib/invariant */ 237);
 	
 	var _prefix = 'ID_';
 	
@@ -27057,7 +27184,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 3)))
 
 /***/ },
-/* 235 */
+/* 237 */
 /*!****************************************!*\
   !*** ./~/flux/~/fbjs/lib/invariant.js ***!
   \****************************************/
@@ -27115,166 +27242,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 3)))
 
 /***/ },
-/* 236 */
-/*!**************************!*\
-  !*** ./app/constants.js ***!
-  \**************************/
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = {
-	  CREATE_TASK: 'CREATE_TASK',
-	  CREATED_TASK: 'CREATED_TASK',
-	
-	  UPDATE_TASK: 'UPDATE_TASK',
-	  UPDATED_TASK: 'UPDATED_TASK',
-	
-	  COMPLETE_TASK: 'COMPLETE_TASK',
-	  COMPLETED_TASK: 'COMPLETED_TASK',
-	
-	  DELETE_TASK: 'DELETE_TASK',
-	  DELETED_TASK: 'DELETED_TASK',
-	
-	  GOT_TASKS: 'GOT_TASKS',
-	
-	  CREATE_LIST: 'CREATE_LIST',
-	  CREATED_LIST: 'CREATED_LIST',
-	
-	  UPDATE_LIST: 'UPDATE_LIST',
-	  UPDATED_LIST: 'UPDATED_LIST',
-	
-	  DELETE_LIST: 'DELETE_LIST',
-	  DELETED_LIST: 'DELETED_LIST',
-	
-	  GOT_LISTS: 'GOT_LISTS'
-	};
-
-/***/ },
-/* 237 */
-/*!*********************************!*\
-  !*** ./app/stores/taskStore.js ***!
-  \*********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var constants = __webpack_require__(/*! ../constants */ 236);
-	
-	var TaskStore = module.exports = __webpack_require__(/*! ./store.js */ 238).extend({
-		init: function init() {
-			this.bind(constants.GOT_TASKS, this.set);
-			this.bind(constants.CREATED_TASK, this.set);
-			this.bind(constants.UPDATED_TASK, this.set);
-			this.bind(constants.DELETED_TASK, this.set);
-		},
-		allIncomplete: function allIncomplete() {
-			var incompleteTasks = [];
-			for (var i = 0; i < this._data.length; i++) {
-				if (this._data[i].completed == 0) incompleteTasks.push(this._data[i]);
-				// this._data[i].completed ? "" : incompleteTasks.push(this._data[i])
-			}
-			return incompleteTasks;
-			// return this._data.filter(function(task) {
-			// return task.completed == 0;
-			// });
-		},
-		getByListId: function getByListId(id) {
-			var listTasks = [];
-			return this._data.filter(function (task) {
-				return task.lists.indexOf(id) !== -1;
-			});
-		}
-	});
-
-/***/ },
 /* 238 */
-/*!*****************************!*\
-  !*** ./app/stores/store.js ***!
-  \*****************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var _dispatcher = __webpack_require__(/*! ../dispatcher */ 232);
-	
-	var _dispatcher2 = _interopRequireDefault(_dispatcher);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var assign = __webpack_require__(/*! object-assign */ 239);
-	var EventEmitterProto = __webpack_require__(/*! events */ 240).EventEmitter.prototype;
-	var CHANGE_EVENT = 'CHANGE';
-	
-	
-	var storeMethods = {
-		init: function init() {},
-		set: function set(arr) {
-			if (arr === null) {
-				console.log("data for store " + this.constructor.name + " is null");
-				return;
-			}
-			this._data = arr;
-		},
-		add: function add(item) {
-			this._data.push(item);
-			this.sort();
-		},
-		sort: function sort() {
-			this._data.sort(function (a, b) {
-				return +new Date(b.created) - +new Date(a.created);
-			});
-		},
-		all: function all() {
-			return this._data;
-		},
-		get: function get(id) {
-			return this._data.filter(function (item) {
-				return item._id === id;
-			})[0];
-		},
-		addChangeListener: function addChangeListener(fn) {
-			this.on(CHANGE_EVENT, fn);
-		},
-		removeChangeListener: function removeChangeListener(fn) {
-			this.removeListener(CHANGE_EVENT, fn);
-		},
-		emitChange: function emitChange() {
-			this.emit(CHANGE_EVENT);
-		},
-		bind: function bind(actionType, actionFn) {
-			if (this.actions[actionType]) {
-				this.actions[actionType].push(actionFn);
-			} else {
-				this.actions[actionType] = [actionFn];
-			}
-		}
-	};
-	
-	exports.extend = function (methods) {
-		var store = {
-			_data: [],
-			actions: {}
-		};
-	
-		assign(store, EventEmitterProto, storeMethods, methods);
-	
-		store.init();
-	
-		_dispatcher2.default.register(function (action) {
-			if (store.actions[action.actionType]) {
-				store.actions[action.actionType].forEach(function (fn) {
-					fn.call(store, action.data);
-					store.emitChange();
-				});
-			}
-		});
-	
-		return store;
-	};
-
-/***/ },
-/* 239 */
 /*!**********************************!*\
   !*** ./~/object-assign/index.js ***!
   \**********************************/
@@ -27366,7 +27334,7 @@
 
 
 /***/ },
-/* 240 */
+/* 239 */
 /*!********************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/events/events.js ***!
   \********************************************************/
@@ -27673,8 +27641,33 @@
 
 
 /***/ },
-/* 241 */,
-/* 242 */
+/* 240 */
+/*!*********************************!*\
+  !*** ./app/stores/listStore.js ***!
+  \*********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var constants = __webpack_require__(/*! ../constants */ 232);
+	
+	var ListStore = module.exports = __webpack_require__(/*! ./store.js */ 233).extend({
+		init: function init() {
+			this.bind(constants.GOT_LISTS, this.set);
+			this.bind(constants.CREATED_LIST, this.set);
+			this.bind(constants.UPDATED_LIST, this.set);
+			this.bind(constants.DELETED_LIST, this.set);
+		},
+		getByIds: function getByIds(id) {
+			return this._data.filter(function (item) {
+				// if list not empty
+				if (typeof item.tasks !== "undefined") return item.tasks.indexOf(id) !== -1;
+			});
+		}
+	});
+
+/***/ },
+/* 241 */
 /*!************************************!*\
   !*** ./app/components/TaskList.js ***!
   \************************************/
@@ -27692,13 +27685,15 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _Task = __webpack_require__(/*! ./Task */ 243);
+	var _Task = __webpack_require__(/*! ./Task */ 242);
 	
 	var _Task2 = _interopRequireDefault(_Task);
 	
-	var _actions = __webpack_require__(/*! ../actions */ 231);
+	var _actions = __webpack_require__(/*! ../actions */ 243);
 	
 	var _actions2 = _interopRequireDefault(_actions);
+	
+	var _reactRouter = __webpack_require__(/*! react-router */ 168);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -27725,7 +27720,8 @@
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TaskList).call(this));
 	
 	    _this.state = {
-	      addingTask: false
+	      addingTask: false,
+	      show: 2
 	    };
 	    _this.addTask = _this.addTask.bind(_this);
 	    _this.taskAdded = _this.taskAdded.bind(_this);
@@ -27750,8 +27746,7 @@
 	      _actions2.default.createTask({
 	        title: title,
 	        desc: desc,
-	        lists: [this.props.activeList],
-	        show: 2
+	        lists: [this.props.activeList]
 	      });
 	    }
 	  }, {
@@ -27785,20 +27780,31 @@
 	        if (task.lists.indexOf(this.props.activeList) != -1) {
 	          // state matches filter or no filter set
 	          if (this.state.show === task.completed || this.state.show === 2) {
-	            tasks.push(_react2.default.createElement(_Task2.default, { update: this.updateTask,
-	              'delete': this.deleteTask,
-	              task: task,
-	              key: task._id }));
+	            tasks.push(_react2.default.createElement(
+	              'li',
+	              { key: task._id },
+	              _react2.default.createElement(
+	                _reactRouter.Link,
+	                { to: '/task/' + task._id },
+	                task.title
+	              )
+	            ));
+	            // tasks.push(<Task update={this.updateTask}
+	            //                   delete={this.deleteTask}
+	            //                   task={task}
+	            //                   key={task._id}/>);
 	          }
 	        }
 	      };
 	      // adding tasks
 	      var emptyListBool = tasks.length === 0 && this.props.activeList !== 0;
 	      if (emptyListBool || this.state.addingTask) {
-	        tasks.push(_react2.default.createElement(_Task2.default, { update: this.createTask,
-	          task: newTask,
-	          taskAdded: this.taskAdded,
-	          key: newTask._id }));
+	        // tasks.push(<Task update={this.createTask}
+	        //                   task={newTask}
+	        //                   taskAdded={this.taskAdded}
+	        //                   key={newTask._id}/>
+	        // );
+	        // tasks.push(<li><Link key={list._id} to={`/list/${list._id}`}>{list.title}</Link></li>);
 	      }
 	      return _react2.default.createElement(
 	        'div',
@@ -27826,7 +27832,7 @@
 	exports.default = TaskList;
 
 /***/ },
-/* 243 */
+/* 242 */
 /*!********************************!*\
   !*** ./app/components/Task.js ***!
   \********************************/
@@ -27866,7 +27872,6 @@
 	      desc: '',
 	      id: ''
 	    };
-	    _this.updateValue = _this.updateValue.bind(_this);
 	    _this.handleChange = _this.handleChange.bind(_this);
 	    _this.complete = _this.complete.bind(_this);
 	    _this.edit = _this.edit.bind(_this);
@@ -27885,11 +27890,6 @@
 	    key: 'handleChange',
 	    value: function handleChange(e) {
 	      this.setState({ title: e.target.value });
-	    }
-	  }, {
-	    key: 'updateValue',
-	    value: function updateValue(title, desc) {
-	      this.setState({ title: title, desc: desc });
 	    }
 	    // should be toggle
 	
@@ -27991,6 +27991,38 @@
 	exports.default = Task;
 
 /***/ },
+/* 243 */
+/*!************************!*\
+  !*** ./app/actions.js ***!
+  \************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _dispatcher = __webpack_require__(/*! ./dispatcher */ 234);
+	
+	var _dispatcher2 = _interopRequireDefault(_dispatcher);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var constants = __webpack_require__(/*! ./constants */ 232);
+	
+	// generating functions for actions
+	Object.keys(constants).forEach(function (key) {
+		var funcName = key.split('_').map(function (word, i) {
+			if (i === 0) return word.toLowerCase();
+			return word[0] + word.slice(1).toLowerCase();
+		}).join('');
+	
+		exports[funcName] = function (data) {
+			_dispatcher2.default.dispatch({
+				actionType: constants[key],
+				data: data
+			});
+		};
+	});
+
+/***/ },
 /* 244 */
 /*!***********************************!*\
   !*** ./app/components/ListBar.js ***!
@@ -28011,11 +28043,11 @@
 	
 	var _reactRouter = __webpack_require__(/*! react-router */ 168);
 	
-	var _ListForm = __webpack_require__(/*! ./ListForm */ 249);
+	var _ListForm = __webpack_require__(/*! ./ListForm */ 245);
 	
 	var _ListForm2 = _interopRequireDefault(_ListForm);
 	
-	var _ListBarItem = __webpack_require__(/*! ./ListBarItem */ 267);
+	var _ListBarItem = __webpack_require__(/*! ./ListBarItem */ 246);
 	
 	var _ListBarItem2 = _interopRequireDefault(_ListBarItem);
 	
@@ -28112,141 +28144,7 @@
 	exports.default = ListBar;
 
 /***/ },
-/* 245 */,
-/* 246 */,
-/* 247 */,
-/* 248 */
-/*!********************!*\
-  !*** ./app/api.js ***!
-  \********************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _actions = __webpack_require__(/*! ./actions */ 231);
-	
-	var _actions2 = _interopRequireDefault(_actions);
-	
-	var _dispatcher = __webpack_require__(/*! ./dispatcher */ 232);
-	
-	var _dispatcher2 = _interopRequireDefault(_dispatcher);
-	
-	var _constants = __webpack_require__(/*! ./constants */ 236);
-	
-	var _constants2 = _interopRequireDefault(_constants);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var API = {
-		fetchLists: function fetchLists() {
-			get('/api/lists').then(_actions2.default.gotLists.bind(_actions2.default));
-		},
-		fetchTasks: function fetchTasks() {
-			get('/api/tasks').then(_actions2.default.gotTasks.bind(_actions2.default));
-		},
-		updateTask: function updateTask(data) {
-			data.id = data.id.trim();
-			if (data.id === '') return;
-			post('/api/task/update', {
-				_id: data.id,
-				title: data.title,
-				desc: data.desc,
-				completed: data.completed
-			}).then(_actions2.default.updatedTask.bind(_actions2.default));
-		},
-		deleteTask: function deleteTask(id) {
-			if (id === '') return;
-			post('/api/task/delete', {
-				_id: id
-			}, 'DELETE').then(_actions2.default.deletedTask.bind(_actions2.default));
-		},
-		deleteList: function deleteList(data) {
-			if (data._id === '') return;
-			post('/api/list/delete', {
-				_id: data._id,
-				tasks: data.tasks
-			}, 'DELETE').then(_actions2.default.deletedList.bind(_actions2.default));
-		},
-	
-		createTask: function createTask(data) {
-			var title = data.title.trim();
-			if (typeof data.desc === "undefined") data.desc = "";
-			var desc = data.desc.trim();
-			if (title === '') return;
-			post('/api/task/create', {
-				title: title,
-				desc: desc,
-				lists: data.lists
-			}).then(_actions2.default.createdTask.bind(_actions2.default));
-		},
-		createList: function createList(data) {
-			var title = data.title.trim();
-			var desc = data.desc.trim();
-			if (title === '') return;
-			post('/api/list/create', {
-				title: title,
-				desc: desc
-			}).then(_actions2.default.createdList.bind(_actions2.default));
-		}
-	};
-	
-	exports.default = API;
-	
-	
-	_dispatcher2.default.register(function (action) {
-		switch (action.actionType) {
-			case _constants2.default.CREATE_TASK:
-				API.createTask(action.data);
-				break;
-				break;
-			case _constants2.default.UPDATE_TASK:
-				API.updateTask(action.data);
-				break;
-			case _constants2.default.DELETE_TASK:
-				API.deleteTask(action.data);
-				break;
-			case _constants2.default.CREATE_LIST:
-				API.createList(action.data);
-				break;
-				break;
-			case _constants2.default.UPDATE_LIST:
-				API.updateList(action.data);
-				break;
-			case _constants2.default.DELETE_LIST:
-				API.deleteList(action.data);
-				break;
-		}
-	});
-	
-	function get(url) {
-		return fetch(url, {
-			credentials: 'include'
-		}).then(function (res) {
-			return res.json();
-		});
-	}
-	
-	function post(url, body, method) {
-		if (method == null) method = 'POST';
-		return fetch(url, {
-			method: method,
-			credentials: 'include',
-			body: JSON.stringify(body || {}),
-			headers: {
-				'Content-Type': 'application/json',
-				'Accept': 'application/json'
-			}
-		}).then(function (res) {
-			return res.json();
-		});
-	}
-
-/***/ },
-/* 249 */
+/* 245 */
 /*!************************************!*\
   !*** ./app/components/ListForm.js ***!
   \************************************/
@@ -28264,7 +28162,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _actions = __webpack_require__(/*! ../actions */ 231);
+	var _actions = __webpack_require__(/*! ../actions */ 243);
 	
 	var _actions2 = _interopRequireDefault(_actions);
 	
@@ -28297,14 +28195,16 @@
 	    _this.createList = _this.createList.bind(_this);
 	    return _this;
 	  }
-	  // lists
-	
 	
 	  _createClass(ListForm, [{
 	    key: 'handleChange',
 	    value: function handleChange(e) {
-	      if (e.target.name === "title") this.setState({ title: e.target.value });else if (e.target.name === "desc") {
-	        this.setState({ desc: e.target.value });
+	      if (e.target.name === "title") this.setState({
+	        title: e.target.value
+	      });else if (e.target.name === "desc") {
+	        this.setState({
+	          desc: e.target.value
+	        });
 	      }
 	    }
 	  }, {
@@ -28327,25 +28227,31 @@
 	          type: 'text',
 	          name: 'title',
 	          value: this.state.title,
-	          onChange: this.handleChange }),
+	          onChange: this.handleChange
+	        }),
+	        ' ',
 	        _react2.default.createElement('input', { className: 'list-desc-field',
 	          placeholder: defaultList.desc,
 	          type: 'text',
 	          name: 'desc',
 	          value: this.state.desc,
-	          onChange: this.handleChange }),
+	          onChange: this.handleChange
+	        }),
+	        ' ',
 	        _react2.default.createElement(
 	          'button',
 	          { className: 'list-create-button',
 	            onClick: this.createList },
-	          'Create List'
+	          ' Create List '
 	        ),
+	        ' ',
 	        _react2.default.createElement(
 	          'button',
 	          { className: 'list-create-button-cancel',
 	            onClick: this.props.detach },
-	          'Cancel'
-	        )
+	          ' Cancel '
+	        ),
+	        ' '
 	      );
 	    }
 	  }]);
@@ -28356,33 +28262,94 @@
 	exports.default = ListForm;
 
 /***/ },
-/* 250 */
-/*!*********************************!*\
-  !*** ./app/stores/listStore.js ***!
-  \*********************************/
+/* 246 */
+/*!***************************************!*\
+  !*** ./app/components/ListBarItem.js ***!
+  \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var constants = __webpack_require__(/*! ../constants */ 236);
-	
-	var ListStore = module.exports = __webpack_require__(/*! ./store.js */ 238).extend({
-		init: function init() {
-			this.bind(constants.GOT_LISTS, this.set);
-			this.bind(constants.CREATED_LIST, this.set);
-			this.bind(constants.UPDATED_LIST, this.set);
-			this.bind(constants.DELETED_LIST, this.set);
-		},
-		getByIds: function getByIds(id) {
-			return this._data.filter(function (item) {
-				// if list not empty
-				if (typeof item.tasks !== "undefined") return item.tasks.indexOf(id) !== -1;
-			});
-		}
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
 	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _actions = __webpack_require__(/*! ../actions */ 243);
+	
+	var _actions2 = _interopRequireDefault(_actions);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var List = function (_React$Component) {
+	  _inherits(List, _React$Component);
+	
+	  function List() {
+	    _classCallCheck(this, List);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(List).call(this));
+	
+	    _this.activate = _this.activate.bind(_this);
+	    _this.deleteList = _this.deleteList.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(List, [{
+	    key: 'activate',
+	    value: function activate() {
+	      this.props.setActive(this.props.list._id);
+	    }
+	  }, {
+	    key: 'deleteList',
+	    value: function deleteList() {
+	      _actions2.default.deleteList({
+	        _id: this.props.list._id,
+	        tasks: this.props.list.tasks
+	      });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'li',
+	        { className: 'list', onClick: this.activate },
+	        _react2.default.createElement(
+	          'span',
+	          { className: 'list__title' },
+	          this.props.list.title
+	        ),
+	        _react2.default.createElement(
+	          'span',
+	          { className: 'list__desc' },
+	          this.props.list.desc
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { onClick: this.deleteList },
+	          'Delete'
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return List;
+	}(_react2.default.Component);
+	
+	exports.default = List;
 
 /***/ },
-/* 251 */
+/* 247 */
 /*!*********************************!*\
   !*** ./app/components/Lists.js ***!
   \*********************************/
@@ -28400,11 +28367,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _actions = __webpack_require__(/*! ../actions */ 231);
+	var _actions = __webpack_require__(/*! ../actions */ 243);
 	
 	var _actions2 = _interopRequireDefault(_actions);
 	
-	var _listStore = __webpack_require__(/*! ../stores/listStore */ 250);
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 240);
 	
 	var _listStore2 = _interopRequireDefault(_listStore);
 	
@@ -28412,7 +28379,7 @@
 	
 	var _ListBar2 = _interopRequireDefault(_ListBar);
 	
-	var _ListForm = __webpack_require__(/*! ./ListForm */ 249);
+	var _ListForm = __webpack_require__(/*! ./ListForm */ 245);
 	
 	var _ListForm2 = _interopRequireDefault(_ListForm);
 	
@@ -28495,160 +28462,7 @@
 	exports.default = Lists;
 
 /***/ },
-/* 252 */
-/*!***********************************!*\
-  !*** ./app/components/NoMatch.js ***!
-  \***********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var NoMatch = function (_React$Component) {
-	  _inherits(NoMatch, _React$Component);
-	
-	  function NoMatch() {
-	    _classCallCheck(this, NoMatch);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(NoMatch).apply(this, arguments));
-	  }
-	
-	  _createClass(NoMatch, [{
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        null,
-	        'Oops, this page does not exist!'
-	      );
-	    }
-	  }]);
-	
-	  return NoMatch;
-	}(_react2.default.Component);
-	
-	exports.default = NoMatch;
-
-/***/ },
-/* 253 */,
-/* 254 */,
-/* 255 */,
-/* 256 */,
-/* 257 */,
-/* 258 */,
-/* 259 */,
-/* 260 */,
-/* 261 */,
-/* 262 */,
-/* 263 */,
-/* 264 */,
-/* 265 */,
-/* 266 */,
-/* 267 */
-/*!***************************************!*\
-  !*** ./app/components/ListBarItem.js ***!
-  \***************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _actions = __webpack_require__(/*! ../actions */ 231);
-	
-	var _actions2 = _interopRequireDefault(_actions);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var List = function (_React$Component) {
-	  _inherits(List, _React$Component);
-	
-	  function List() {
-	    _classCallCheck(this, List);
-	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(List).call(this));
-	
-	    _this.activate = _this.activate.bind(_this);
-	    _this.deleteList = _this.deleteList.bind(_this);
-	    return _this;
-	  }
-	
-	  _createClass(List, [{
-	    key: 'activate',
-	    value: function activate() {
-	      this.props.setActive(this.props.list._id);
-	    }
-	  }, {
-	    key: 'deleteList',
-	    value: function deleteList() {
-	      _actions2.default.deleteList({
-	        _id: this.props.list._id,
-	        tasks: this.props.list.tasks
-	      });
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'li',
-	        { className: 'list', onClick: this.activate },
-	        _react2.default.createElement(
-	          'span',
-	          { className: 'list__title' },
-	          this.props.list.title
-	        ),
-	        _react2.default.createElement(
-	          'span',
-	          { className: 'list__desc' },
-	          this.props.list.desc
-	        ),
-	        _react2.default.createElement(
-	          'button',
-	          { onClick: this.deleteList },
-	          'Delete'
-	        )
-	      );
-	    }
-	  }]);
-	
-	  return List;
-	}(_react2.default.Component);
-	
-	exports.default = List;
-
-/***/ },
-/* 268 */
+/* 248 */
 /*!**************************************!*\
   !*** ./app/components/ListDetail.js ***!
   \**************************************/
@@ -28666,11 +28480,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _listStore = __webpack_require__(/*! ../stores/listStore */ 250);
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 240);
 	
 	var _listStore2 = _interopRequireDefault(_listStore);
 	
-	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 237);
+	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 231);
 	
 	var _taskStore2 = _interopRequireDefault(_taskStore);
 	
@@ -28761,7 +28575,7 @@
 	exports.default = ListDetail;
 
 /***/ },
-/* 269 */
+/* 249 */
 /*!**************************************!*\
   !*** ./app/components/TaskDetail.js ***!
   \**************************************/
@@ -28779,13 +28593,17 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _listStore = __webpack_require__(/*! ../stores/listStore */ 250);
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 240);
 	
 	var _listStore2 = _interopRequireDefault(_listStore);
 	
-	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 237);
+	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 231);
 	
 	var _taskStore2 = _interopRequireDefault(_taskStore);
+	
+	var _actions = __webpack_require__(/*! ../actions */ 243);
+	
+	var _actions2 = _interopRequireDefault(_actions);
 	
 	var _reactRouter = __webpack_require__(/*! react-router */ 168);
 	
@@ -28806,13 +28624,94 @@
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TaskDetail).call(this));
 	
 	    _this.state = {
-	      task: {}
+	      task: {},
+	      title: '',
+	      desc: '',
+	      allLists: [],
+	      editLists: []
 	    };
 	    _this.onChange = _this.onChange.bind(_this);
+	    _this.handleChange = _this.handleChange.bind(_this);
+	    _this.complete = _this.complete.bind(_this);
+	    _this.edit = _this.edit.bind(_this);
+	    // this.delete = this.delete.bind(this);
+	    _this.cancelEdit = _this.cancelEdit.bind(_this);
+	    _this.completeEdit = _this.completeEdit.bind(_this);
 	    return _this;
 	  }
 	
 	  _createClass(TaskDetail, [{
+	    key: 'edit',
+	    value: function edit() {
+	      // set
+	      this.setState({
+	        edited: true,
+	        title: this.state.task.title,
+	        desc: this.state.task.desc,
+	        editLists: this.state.task.lists.slice()
+	      });
+	    }
+	  }, {
+	    key: 'handleChange',
+	    value: function handleChange(e) {
+	      if (e.target.name === "title") this.setState({
+	        title: e.target.value
+	      });else if (e.target.name === "desc") {
+	        this.setState({
+	          desc: e.target.value
+	        });
+	      } else if (e.target.className === "list") {
+	        if (e.target.checked) {
+	          var eL = this.state.editLists.slice();
+	          eL.push(e.target.id);
+	          console.log(eL);
+	          this.setState({
+	            editLists: eL
+	          });
+	        } else {
+	          var _eL = this.state.editLists.slice();
+	          _eL.splice(_eL.indexOf(e.target.id), 1);
+	          this.setState({
+	            editLists: _eL
+	          });
+	        }
+	      }
+	    }
+	    // should be toggle
+	
+	  }, {
+	    key: 'complete',
+	    value: function complete() {
+	      this.props.update(this.state.id, this.state.title, this.state.desc, !this.state.task.comleted);
+	    }
+	  }, {
+	    key: 'cancelEdit',
+	    value: function cancelEdit() {
+	      this.setState({ edited: false });
+	    }
+	  }, {
+	    key: 'updateTask',
+	    value: function updateTask(_id, title, desc, completed, lists) {
+	      _actions2.default.updateTask({ _id: _id,
+	        title: title,
+	        desc: desc,
+	        completed: completed,
+	        lists: lists
+	      });
+	    }
+	  }, {
+	    key: 'completeEdit',
+	    value: function completeEdit() {
+	      // new task, no id
+	      if (this.state.id === 0) {
+	        this.props.update(this.state.title, this.state.desc);
+	        this.props.taskAdded();
+	      } else {
+	        this.updateTask(this.state.task._id, this.state.title, this.state.desc, 0, this.state.editLists);
+	      }
+	      this.setState({ edited: false });
+	    }
+	  }, {
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      this.onChange();
@@ -28830,39 +28729,111 @@
 	    value: function onChange() {
 	      this.setState({
 	        task: _taskStore2.default.get(this.props.params.id),
-	        lists: _listStore2.default.getByIds(this.props.params.id)
+	        allLists: _listStore2.default.all()
 	      });
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var checked = false;
+	      if (this.state.completed == 1) checked = true;
 	      var taskTitle = this.state.task.title ? this.state.task.title : '';
 	      var taskDesc = this.state.task.desc ? this.state.task.desc : '';
+	      var buttons = _react2.default.createElement(
+	        'div',
+	        { className: 'task__buttons' },
+	        _react2.default.createElement(
+	          'button',
+	          { className: 'task__edit-button',
+	            onClick: this.edit },
+	          'Edit'
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { className: 'task__delete-button',
+	            onClick: this.delete },
+	          'Delete'
+	        )
+	      );
+	
 	      var lists = [];
-	      if (typeof this.state.lists !== "undefined" && this.state.lists.length > 0) {
-	        for (var i = 0; i < this.state.lists.length; i++) {
-	          var list = this.state.lists[i];
-	          lists.push(_react2.default.createElement(
-	            _reactRouter.Link,
-	            { key: list._id, to: '/list/' + list._id },
+	      var st = this.state;
+	      if (typeof st.allLists === "undefined" || st.allLists.length === 0) return _react2.default.createElement(
+	        'span',
+	        null,
+	        'Nothing in here!'
+	      );
+	      var srcLists = st.task.lists;
+	      // if edited
+	      if (this.state.edited) {
+	        taskTitle = this.state.title;
+	        taskDesc = this.state.desc;
+	        srcLists = this.state.editLists;
+	        buttons = _react2.default.createElement(
+	          'div',
+	          { className: 'task__buttons' },
+	          _react2.default.createElement(
+	            'button',
+	            { className: 'task__cancel-edit-button',
+	              onClick: this.cancelEdit },
+	            'Cancel'
+	          ),
+	          _react2.default.createElement(
+	            'button',
+	            { className: 'task__complete-edit-button',
+	              onClick: this.completeEdit },
+	            'Save'
+	          )
+	        );
+	      }
+	      for (var i = 0; i < st.allLists.length; i++) {
+	        var list = st.allLists[i];
+	        var listAssigned = srcLists.indexOf(list._id) !== -1 ? true : false;
+	        lists.push(_react2.default.createElement(
+	          'li',
+	          { key: list._id },
+	          _react2.default.createElement('input', { type: 'checkbox', disabled: !this.state.edited, className: 'list', id: list._id, checked: listAssigned,
+	            onChange: this.handleChange }),
+	          _react2.default.createElement(
+	            'span',
+	            null,
 	            list.title
-	          ));
-	        }
+	          ),
+	          _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: '/list/' + list._id },
+	            'Detail'
+	          )
+	        ));
 	      }
 	      return _react2.default.createElement(
 	        'div',
 	        null,
+	        _react2.default.createElement('input', { className: 'task__checkbox',
+	          type: 'checkbox',
+	          checked: checked,
+	          onClick: this.complete }),
+	        _react2.default.createElement('input', { className: 'task__title',
+	          disabled: !this.state.edited,
+	          name: 'title',
+	          onChange: this.handleChange,
+	          value: taskTitle }),
+	        _react2.default.createElement('input', { className: 'task__desc',
+	          disabled: !this.state.edited,
+	          name: 'desc',
+	          onChange: this.handleChange,
+	          value: taskDesc }),
+	        buttons,
 	        _react2.default.createElement(
-	          'h2',
+	          'h3',
 	          null,
-	          taskTitle
+	          'Lists'
 	        ),
 	        _react2.default.createElement(
-	          'small',
+	          'ul',
 	          null,
-	          taskDesc
-	        ),
-	        lists
+	          lists
+	        )
 	      );
 	    }
 	  }]);
@@ -28871,6 +28842,182 @@
 	}(_react2.default.Component);
 	
 	exports.default = TaskDetail;
+
+/***/ },
+/* 250 */
+/*!***********************************!*\
+  !*** ./app/components/NoMatch.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var NoMatch = function (_React$Component) {
+	  _inherits(NoMatch, _React$Component);
+	
+	  function NoMatch() {
+	    _classCallCheck(this, NoMatch);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(NoMatch).apply(this, arguments));
+	  }
+	
+	  _createClass(NoMatch, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        'Oops, this page does not exist!'
+	      );
+	    }
+	  }]);
+	
+	  return NoMatch;
+	}(_react2.default.Component);
+	
+	exports.default = NoMatch;
+
+/***/ },
+/* 251 */
+/*!********************!*\
+  !*** ./app/api.js ***!
+  \********************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _actions = __webpack_require__(/*! ./actions */ 243);
+	
+	var _actions2 = _interopRequireDefault(_actions);
+	
+	var _dispatcher = __webpack_require__(/*! ./dispatcher */ 234);
+	
+	var _dispatcher2 = _interopRequireDefault(_dispatcher);
+	
+	var _constants = __webpack_require__(/*! ./constants */ 232);
+	
+	var _constants2 = _interopRequireDefault(_constants);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var API = {
+		fetchLists: function fetchLists() {
+			get('/api/lists').then(_actions2.default.gotLists.bind(_actions2.default));
+		},
+		fetchTasks: function fetchTasks() {
+			get('/api/tasks').then(_actions2.default.gotTasks.bind(_actions2.default));
+		},
+		updateTask: function updateTask(data) {
+			post('/api/task/update', data).then(_actions2.default.updatedTask.bind(_actions2.default));
+		},
+		deleteTask: function deleteTask(id) {
+			if (id === '') return;
+			post('/api/task/delete', {
+				_id: id
+			}, 'DELETE').then(_actions2.default.deletedTask.bind(_actions2.default));
+		},
+		deleteList: function deleteList(data) {
+			if (data._id === '') return;
+			post('/api/list/delete', {
+				_id: data._id,
+				tasks: data.tasks
+			}, 'DELETE').then(_actions2.default.deletedList.bind(_actions2.default));
+		},
+	
+		createTask: function createTask(data) {
+			var title = data.title.trim();
+			if (typeof data.desc === "undefined") data.desc = "";
+			var desc = data.desc.trim();
+			if (title === '') return;
+			post('/api/task/create', {
+				title: title,
+				desc: desc,
+				lists: data.lists
+			}).then(_actions2.default.createdTask.bind(_actions2.default));
+		},
+		createList: function createList(data) {
+			var title = data.title.trim();
+			var desc = data.desc.trim();
+			if (title === '') return;
+			post('/api/list/create', {
+				title: title,
+				desc: desc
+			}).then(_actions2.default.createdList.bind(_actions2.default));
+		}
+	};
+	
+	exports.default = API;
+	
+	
+	_dispatcher2.default.register(function (action) {
+		switch (action.actionType) {
+			case _constants2.default.CREATE_TASK:
+				API.createTask(action.data);
+				break;
+				break;
+			case _constants2.default.UPDATE_TASK:
+				API.updateTask(action.data);
+				break;
+			case _constants2.default.DELETE_TASK:
+				API.deleteTask(action.data);
+				break;
+			case _constants2.default.CREATE_LIST:
+				API.createList(action.data);
+				break;
+				break;
+			case _constants2.default.UPDATE_LIST:
+				API.updateList(action.data);
+				break;
+			case _constants2.default.DELETE_LIST:
+				API.deleteList(action.data);
+				break;
+		}
+	});
+	
+	function get(url) {
+		return fetch(url, {
+			credentials: 'include'
+		}).then(function (res) {
+			return res.json();
+		});
+	}
+	
+	function post(url, body, method) {
+		if (method == null) method = 'POST';
+		return fetch(url, {
+			method: method,
+			credentials: 'include',
+			body: JSON.stringify(body || {}),
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
+			}
+		}).then(function (res) {
+			return res.json();
+		});
+	}
 
 /***/ }
 /******/ ]);

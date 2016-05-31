@@ -17,7 +17,8 @@ class ListForm extends React.Component {
       };
       this.handleChange = this.handleChange.bind(this);
       this.createList = this.createList.bind(this);
-  }
+    }
+    // lists
   handleChange(e) {
     if (e.target.name === "title")
       this.setState({
