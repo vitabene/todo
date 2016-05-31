@@ -1,7 +1,9 @@
 import React, { PropTypes } from 'react'
-import List from './List'
+import {Link} from 'react-router'
+import ListBarItem from './ListBarItem'
 
 const defaultList = {
+  _id: 0,
   title : "Untitled List",
   desc: "Default Untitled List"
 };
@@ -9,24 +11,29 @@ const defaultList = {
 class ListBar extends React.Component {
   // lists
   render () {
-    let lists = [];
+    let lists = [],
+        listActive = false;
     if (typeof this.props.lists != "undefined") {
-      for (let i = this.props.lists.length - 1; i >= 0; i--) {
-          lists.push(<List update={this.props.updateTask}
-                            task={this.props.lists[i]}
-                            key={this.props.lists[i].created}/>);
+      for (let i = 0; i < this.props.lists.length; i++) {
+        let list = this.props.lists[i];
+        if (this.props.activeList === i || this.props.activeList === list._id) {
+          listActive = true;
+        }
+        lists.push(<ListBarItem update={this.props.updateList}
+                          list={list}
+                          active={listActive}
+                          setActive={this.props.setActive}
+                          key={list._id}/>);
       };
     }
-    // default untitled list
-    if (lists.length === 0) {
-      lists.push(<List update={this.props.updateTask}
-                        list={defaultList}/>);
-    }
     return (
-      <ul className="list-bar" id="listBar">
-        {lists}
-        <li className="list add" id="addList">+</li>
-      </ul>
+      <div>
+        <Link to='lists'>All Lists</Link>
+        <ul className="list-bar" id="listBar">
+          {lists}
+          <li className="list add" id="addList">+</li>
+        </ul>
+      </div>
     );
   }
 }

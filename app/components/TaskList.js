@@ -16,36 +16,53 @@ class TaskList extends React.Component {
       addingTask: false
     };
     this.addTask = this.addTask.bind(this);
+    this.taskAdded = this.taskAdded.bind(this);
+    this.createTask = this.createTask.bind(this);
   }
   addTask(){
     this.setState({addingTask: true});
   }
+  taskAdded(){
+    this.setState({addingTask: false});
+  }
   createTask(title, desc) {
-    actions.createTask(title, desc);
+    actions.createTask({
+      title: title,
+      desc: desc,
+      lists: [this.props.activeList]
+    });
   }
   deleteTask(id) {
     actions.deleteTask(id);
   }
   updateTask(id, title, desc, completed) {
-    if (typeof desc === "undefined") desc = "";
-    console.log("taskUpdate", id, title, desc, completed);
-    actions.updateTask({id: id, title: title, description: desc, completed: completed});
+    actions.updateTask({id: id,
+      title: title,
+      desc: desc,
+      completed: completed
+    });
   }
   render() {
     let tasks = [];
     if (typeof this.props.tasks != "undefined") {
       for (let i = this.props.tasks.length - 1; i >= 0; i--) {
+        let task = this.props.tasks[i];
+        if (task.lists.indexOf(this.props.activeList) != -1) {
           tasks.push(<Task update={this.updateTask}
                             delete={this.deleteTask}
-                            task={this.props.tasks[i]}
-                            key={this.props.tasks[i]._id}/>);
+                            task={task}
+                            key={task._id}/>);
+        }
       };
     }
     // adding tasks
-    if (tasks.length === 0 || this.state.addingTask) {
+    var emptyListBool = tasks.length === 0 && this.props.activeList !== 0;
+    if (emptyListBool || this.state.addingTask) {
       tasks.push(<Task update={this.createTask}
                         task={newTask}
-                        key={newTask._id}/>);
+                        taskAdded={this.taskAdded}
+                        key={newTask._id}/>
+      );
     }
     return (
       <ul className="task-list" id="taskList">

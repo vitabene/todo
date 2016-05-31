@@ -24,9 +24,9 @@ class Task extends React.Component {
     this.setState({title: e.target.value});
   }
   updateValue(title, desc){
-    console.log(title, desc);
     this.setState({title: title, desc: desc});
   }
+  // should be toggle
   complete() {
     this.props.update(this.state.id, this.state.title, this.state.desc, 1);
   }
@@ -37,8 +37,8 @@ class Task extends React.Component {
     // new task, no id
     if (this.state.id === 0) {
       this.props.update(this.state.title, this.state.desc);
+      this.props.taskAdded();
     } else {
-      // console.log(this.state.id, this.state.title, this.state.desc, 0);
       this.props.update(this.state.id, this.state.title, this.state.desc, 0);
     }
     this.setState({edited: false});

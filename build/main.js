@@ -67,6 +67,18 @@
 	
 	var _Home2 = _interopRequireDefault(_Home);
 	
+	var _Lists = __webpack_require__(/*! ./components/Lists */ 251);
+	
+	var _Lists2 = _interopRequireDefault(_Lists);
+	
+	var _ListDetail = __webpack_require__(/*! ./components/ListDetail */ 268);
+	
+	var _ListDetail2 = _interopRequireDefault(_ListDetail);
+	
+	var _NoMatch = __webpack_require__(/*! ./components/NoMatch */ 252);
+	
+	var _NoMatch2 = _interopRequireDefault(_NoMatch);
+	
 	var _api = __webpack_require__(/*! ./api */ 248);
 	
 	var _api2 = _interopRequireDefault(_api);
@@ -78,11 +90,14 @@
 	
 	_reactDom2.default.render(_react2.default.createElement(
 	  _reactRouter.Router,
-	  { history: _reactRouter.hashHistory },
+	  { history: _reactRouter.browserHistory },
 	  _react2.default.createElement(
 	    _reactRouter.Route,
 	    { path: '/', component: _App2.default },
-	    _react2.default.createElement(_reactRouter.IndexRoute, { component: _Home2.default })
+	    _react2.default.createElement(_reactRouter.IndexRoute, { component: _Home2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'lists', component: _Lists2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: '/list/:id', component: _ListDetail2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: '*', component: _NoMatch2.default })
 	  )
 	), document.getElementById('app'));
 
@@ -26556,7 +26571,7 @@
   \*******************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -26567,10 +26582,6 @@
 	var _react = __webpack_require__(/*! react */ 1);
 	
 	var _react2 = _interopRequireDefault(_react);
-	
-	var _Home = __webpack_require__(/*! ./Home */ 230);
-	
-	var _Home2 = _interopRequireDefault(_Home);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -26590,11 +26601,11 @@
 	  }
 	
 	  _createClass(App, [{
-	    key: 'render',
+	    key: "render",
 	    value: function render() {
 	      return _react2.default.createElement(
-	        'div',
-	        null,
+	        "div",
+	        { className: "taskboard", id: "taskboard" },
 	        this.props.children
 	      );
 	    }
@@ -26620,6 +26631,10 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
 	var _actions = __webpack_require__(/*! ../actions */ 231);
 	
 	var _actions2 = _interopRequireDefault(_actions);
@@ -26628,17 +26643,21 @@
 	
 	var _taskStore2 = _interopRequireDefault(_taskStore);
 	
-	var _TaskBoard = __webpack_require__(/*! ./TaskBoard */ 241);
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 250);
 	
-	var _TaskBoard2 = _interopRequireDefault(_TaskBoard);
+	var _listStore2 = _interopRequireDefault(_listStore);
 	
-	var _reactAddonsUpdate = __webpack_require__(/*! react-addons-update */ 246);
+	var _TaskList = __webpack_require__(/*! ./TaskList */ 242);
 	
-	var _reactAddonsUpdate2 = _interopRequireDefault(_reactAddonsUpdate);
+	var _TaskList2 = _interopRequireDefault(_TaskList);
 	
-	var _react = __webpack_require__(/*! react */ 1);
+	var _ListBar = __webpack_require__(/*! ./ListBar */ 244);
 	
-	var _react2 = _interopRequireDefault(_react);
+	var _ListBar2 = _interopRequireDefault(_ListBar);
+	
+	var _ListForm = __webpack_require__(/*! ./ListForm */ 249);
+	
+	var _ListForm2 = _interopRequireDefault(_ListForm);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -26657,10 +26676,12 @@
 	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Home).call(this));
 	
 	    _this.state = {
-	      tasks: _taskStore2.default.all()
+	      tasks: _taskStore2.default.all(),
+	      lists: _listStore2.default.all(),
+	      activeList: 0
 	    };
 	    _this.onChange = _this.onChange.bind(_this);
-	    // this.updateTask = this.updateTask.bind(this);
+	    _this.setActive = _this.setActive.bind(_this);
 	    return _this;
 	  }
 	
@@ -26668,23 +26689,46 @@
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 	      _taskStore2.default.addChangeListener(this.onChange);
+	      _listStore2.default.addChangeListener(this.onChange);
 	    }
 	  }, {
 	    key: 'componentWillUnmount',
 	    value: function componentWillUnmount() {
 	      _taskStore2.default.removeChangeListener(this.onChange);
+	      _listStore2.default.removeChangeListener(this.onChange);
+	    }
+	  }, {
+	    key: 'setActive',
+	    value: function setActive(id) {
+	      this.setState({
+	        activeList: id
+	      });
 	    }
 	  }, {
 	    key: 'onChange',
 	    value: function onChange() {
+	      // first list active, or current one
+	      var lists = _listStore2.default.all();
+	      var activeListId = lists[0] ? lists[0]._id : 0;
+	      if (this.state.activeList != 0) activeListId = this.state.activeList;
 	      this.setState({
-	        tasks: _taskStore2.default.all()
+	        tasks: _taskStore2.default.all(),
+	        lists: lists,
+	        activeList: activeListId
 	      });
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      return _react2.default.createElement(_TaskBoard2.default, { tasks: this.state.tasks });
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(_ListForm2.default, null),
+	        _react2.default.createElement(_ListBar2.default, { activeList: this.state.activeList,
+	          setActive: this.setActive,
+	          lists: this.state.lists }),
+	        _react2.default.createElement(_TaskList2.default, { activeList: this.state.activeList, tasks: this.state.tasks })
+	      );
 	    }
 	  }]);
 	
@@ -27100,16 +27144,10 @@
 	  UPDATE_LIST: 'UPDATE_LIST',
 	  UPDATED_LIST: 'UPDATED_LIST',
 	
-	  COMPLETE_LIST: 'COMPLETE_LIST',
-	  COMPLETED_LIST: 'COMPLETED_LIST',
+	  DELETE_LIST: 'DELETE_LIST',
+	  DELETED_LIST: 'DELETED_LIST',
 	
 	  GOT_LISTS: 'GOT_LISTS'
-	
-	  // GOT_CURRENT_HERO: 'GOT_CURRENT_HERO',
-	  // GOT_HEROES: 'GOT_HEROES',
-	
-	  // GOT_MAP: 'GOT_MAP',
-	  // GOT_MAP_OBJECTS: 'GOT_MAP_OBJECTS'
 	};
 
 /***/ },
@@ -27140,6 +27178,12 @@
 			// return this._data.filter(function(task) {
 			// return task.completed == 0;
 			// });
+		},
+		getByListId: function getByListId(id) {
+			var listTasks = [];
+			return this._data.filter(function (task) {
+				return task.lists.indexOf(id) !== -1;
+			});
 		}
 	});
 
@@ -27186,7 +27230,7 @@
 		},
 		get: function get(id) {
 			return this._data.filter(function (item) {
-				return item.Id === id;
+				return item._id === id;
 			})[0];
 		},
 		addChangeListener: function addChangeListener(fn) {
@@ -27629,80 +27673,7 @@
 
 
 /***/ },
-/* 241 */
-/*!*************************************!*\
-  !*** ./app/components/TaskBoard.js ***!
-  \*************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _actions = __webpack_require__(/*! ../actions */ 231);
-	
-	var _actions2 = _interopRequireDefault(_actions);
-	
-	var _TaskList = __webpack_require__(/*! ./TaskList */ 242);
-	
-	var _TaskList2 = _interopRequireDefault(_TaskList);
-	
-	var _ListBar = __webpack_require__(/*! ./ListBar */ 244);
-	
-	var _ListBar2 = _interopRequireDefault(_ListBar);
-	
-	var _Task = __webpack_require__(/*! ./Task */ 243);
-	
-	var _Task2 = _interopRequireDefault(_Task);
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var TaskBoard = function (_React$Component) {
-	  _inherits(TaskBoard, _React$Component);
-	
-	  function TaskBoard() {
-	    _classCallCheck(this, TaskBoard);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(TaskBoard).apply(this, arguments));
-	  }
-	
-	  _createClass(TaskBoard, [{
-	    key: 'updateList',
-	    value: function updateList(id, title, desc, completed) {
-	      console.log("update list called");
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'taskboard', id: 'taskboard' },
-	        _react2.default.createElement(_ListBar2.default, { updateTask: this.props.updateList }),
-	        _react2.default.createElement(_TaskList2.default, { tasks: this.props.tasks })
-	      );
-	    }
-	  }]);
-	
-	  return TaskBoard;
-	}(_react2.default.Component);
-	
-	exports.default = TaskBoard;
-
-/***/ },
+/* 241 */,
 /* 242 */
 /*!************************************!*\
   !*** ./app/components/TaskList.js ***!
@@ -27757,6 +27728,8 @@
 	      addingTask: false
 	    };
 	    _this.addTask = _this.addTask.bind(_this);
+	    _this.taskAdded = _this.taskAdded.bind(_this);
+	    _this.createTask = _this.createTask.bind(_this);
 	    return _this;
 	  }
 	
@@ -27766,9 +27739,18 @@
 	      this.setState({ addingTask: true });
 	    }
 	  }, {
+	    key: 'taskAdded',
+	    value: function taskAdded() {
+	      this.setState({ addingTask: false });
+	    }
+	  }, {
 	    key: 'createTask',
 	    value: function createTask(title, desc) {
-	      _actions2.default.createTask(title, desc);
+	      _actions2.default.createTask({
+	        title: title,
+	        desc: desc,
+	        lists: [this.props.activeList]
+	      });
 	    }
 	  }, {
 	    key: 'deleteTask',
@@ -27778,9 +27760,11 @@
 	  }, {
 	    key: 'updateTask',
 	    value: function updateTask(id, title, desc, completed) {
-	      if (typeof desc === "undefined") desc = "";
-	      console.log("taskUpdate", id, title, desc, completed);
-	      _actions2.default.updateTask({ id: id, title: title, description: desc, completed: completed });
+	      _actions2.default.updateTask({ id: id,
+	        title: title,
+	        desc: desc,
+	        completed: completed
+	      });
 	    }
 	  }, {
 	    key: 'render',
@@ -27788,16 +27772,21 @@
 	      var tasks = [];
 	      if (typeof this.props.tasks != "undefined") {
 	        for (var i = this.props.tasks.length - 1; i >= 0; i--) {
-	          tasks.push(_react2.default.createElement(_Task2.default, { update: this.updateTask,
-	            'delete': this.deleteTask,
-	            task: this.props.tasks[i],
-	            key: this.props.tasks[i]._id }));
+	          var task = this.props.tasks[i];
+	          if (task.lists.indexOf(this.props.activeList) != -1) {
+	            tasks.push(_react2.default.createElement(_Task2.default, { update: this.updateTask,
+	              'delete': this.deleteTask,
+	              task: task,
+	              key: task._id }));
+	          }
 	        };
 	      }
 	      // adding tasks
-	      if (tasks.length === 0 || this.state.addingTask) {
+	      var emptyListBool = tasks.length === 0 && this.props.activeList !== 0;
+	      if (emptyListBool || this.state.addingTask) {
 	        tasks.push(_react2.default.createElement(_Task2.default, { update: this.createTask,
 	          task: newTask,
+	          taskAdded: this.taskAdded,
 	          key: newTask._id }));
 	      }
 	      return _react2.default.createElement(
@@ -27882,9 +27871,10 @@
 	  }, {
 	    key: 'updateValue',
 	    value: function updateValue(title, desc) {
-	      console.log(title, desc);
 	      this.setState({ title: title, desc: desc });
 	    }
+	    // should be toggle
+	
 	  }, {
 	    key: 'complete',
 	    value: function complete() {
@@ -27901,8 +27891,8 @@
 	      // new task, no id
 	      if (this.state.id === 0) {
 	        this.props.update(this.state.title, this.state.desc);
+	        this.props.taskAdded();
 	      } else {
-	        // console.log(this.state.id, this.state.title, this.state.desc, 0);
 	        this.props.update(this.state.id, this.state.title, this.state.desc, 0);
 	      }
 	      this.setState({ edited: false });
@@ -28001,9 +27991,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _List = __webpack_require__(/*! ./List */ 245);
+	var _reactRouter = __webpack_require__(/*! react-router */ 168);
 	
-	var _List2 = _interopRequireDefault(_List);
+	var _ListBarItem = __webpack_require__(/*! ./ListBarItem */ 267);
+	
+	var _ListBarItem2 = _interopRequireDefault(_ListBarItem);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28014,6 +28006,7 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
 	var defaultList = {
+	  _id: 0,
 	  title: "Untitled List",
 	  desc: "Default Untitled List"
 	};
@@ -28032,27 +28025,38 @@
 	
 	    // lists
 	    value: function render() {
-	      var lists = [];
+	      var lists = [],
+	          listActive = false;
 	      if (typeof this.props.lists != "undefined") {
-	        for (var i = this.props.lists.length - 1; i >= 0; i--) {
-	          lists.push(_react2.default.createElement(_List2.default, { update: this.props.updateTask,
-	            task: this.props.lists[i],
-	            key: this.props.lists[i].created }));
+	        for (var i = 0; i < this.props.lists.length; i++) {
+	          var list = this.props.lists[i];
+	          if (this.props.activeList === i || this.props.activeList === list._id) {
+	            listActive = true;
+	          }
+	          lists.push(_react2.default.createElement(_ListBarItem2.default, { update: this.props.updateList,
+	            list: list,
+	            active: listActive,
+	            setActive: this.props.setActive,
+	            key: list._id }));
 	        };
 	      }
-	      // default untitled list
-	      if (lists.length === 0) {
-	        lists.push(_react2.default.createElement(_List2.default, { update: this.props.updateTask,
-	          list: defaultList }));
-	      }
 	      return _react2.default.createElement(
-	        'ul',
-	        { className: 'list-bar', id: 'listBar' },
-	        lists,
+	        'div',
+	        null,
 	        _react2.default.createElement(
-	          'li',
-	          { className: 'list add', id: 'addList' },
-	          '+'
+	          _reactRouter.Link,
+	          { to: 'lists' },
+	          'All Lists'
+	        ),
+	        _react2.default.createElement(
+	          'ul',
+	          { className: 'list-bar', id: 'listBar' },
+	          lists,
+	          _react2.default.createElement(
+	            'li',
+	            { className: 'list add', id: 'addList' },
+	            '+'
+	          )
 	        )
 	      );
 	    }
@@ -28064,197 +28068,9 @@
 	exports.default = ListBar;
 
 /***/ },
-/* 245 */
-/*!********************************!*\
-  !*** ./app/components/List.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var List = function (_React$Component) {
-	  _inherits(List, _React$Component);
-	
-	  function List() {
-	    _classCallCheck(this, List);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(List).apply(this, arguments));
-	  }
-	
-	  _createClass(List, [{
-	    key: "render",
-	    value: function render() {
-	      return _react2.default.createElement(
-	        "li",
-	        { className: "list" },
-	        _react2.default.createElement(
-	          "span",
-	          { className: "list__title" },
-	          this.props.list.title
-	        ),
-	        _react2.default.createElement(
-	          "span",
-	          { className: "list__desc" },
-	          this.props.list.desc
-	        )
-	      );
-	    }
-	  }]);
-	
-	  return List;
-	}(_react2.default.Component);
-	
-	exports.default = List;
-
-/***/ },
-/* 246 */
-/*!****************************************!*\
-  !*** ./~/react-addons-update/index.js ***!
-  \****************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(/*! react/lib/update */ 247);
-
-/***/ },
-/* 247 */
-/*!*******************************!*\
-  !*** ./~/react/lib/update.js ***!
-  \*******************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule update
-	 */
-	
-	/* global hasOwnProperty:true */
-	
-	'use strict';
-	
-	var _assign = __webpack_require__(/*! object-assign */ 4);
-	
-	var keyOf = __webpack_require__(/*! fbjs/lib/keyOf */ 31);
-	var invariant = __webpack_require__(/*! fbjs/lib/invariant */ 7);
-	var hasOwnProperty = {}.hasOwnProperty;
-	
-	function shallowCopy(x) {
-	  if (Array.isArray(x)) {
-	    return x.concat();
-	  } else if (x && typeof x === 'object') {
-	    return _assign(new x.constructor(), x);
-	  } else {
-	    return x;
-	  }
-	}
-	
-	var COMMAND_PUSH = keyOf({ $push: null });
-	var COMMAND_UNSHIFT = keyOf({ $unshift: null });
-	var COMMAND_SPLICE = keyOf({ $splice: null });
-	var COMMAND_SET = keyOf({ $set: null });
-	var COMMAND_MERGE = keyOf({ $merge: null });
-	var COMMAND_APPLY = keyOf({ $apply: null });
-	
-	var ALL_COMMANDS_LIST = [COMMAND_PUSH, COMMAND_UNSHIFT, COMMAND_SPLICE, COMMAND_SET, COMMAND_MERGE, COMMAND_APPLY];
-	
-	var ALL_COMMANDS_SET = {};
-	
-	ALL_COMMANDS_LIST.forEach(function (command) {
-	  ALL_COMMANDS_SET[command] = true;
-	});
-	
-	function invariantArrayCase(value, spec, command) {
-	  !Array.isArray(value) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected target of %s to be an array; got %s.', command, value) : invariant(false) : void 0;
-	  var specValue = spec[command];
-	  !Array.isArray(specValue) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array; got %s. ' + 'Did you forget to wrap your parameter in an array?', command, specValue) : invariant(false) : void 0;
-	}
-	
-	/**
-	 * Returns a updated shallow copy of an object without mutating the original.
-	 * See https://facebook.github.io/react/docs/update.html for details.
-	 */
-	function update(value, spec) {
-	  !(typeof spec === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): You provided a key path to update() that did not contain one ' + 'of %s. Did you forget to include {%s: ...}?', ALL_COMMANDS_LIST.join(', '), COMMAND_SET) : invariant(false) : void 0;
-	
-	  if (hasOwnProperty.call(spec, COMMAND_SET)) {
-	    !(Object.keys(spec).length === 1) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Cannot have more than one key in an object with %s', COMMAND_SET) : invariant(false) : void 0;
-	
-	    return spec[COMMAND_SET];
-	  }
-	
-	  var nextValue = shallowCopy(value);
-	
-	  if (hasOwnProperty.call(spec, COMMAND_MERGE)) {
-	    var mergeObj = spec[COMMAND_MERGE];
-	    !(mergeObj && typeof mergeObj === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): %s expects a spec of type \'object\'; got %s', COMMAND_MERGE, mergeObj) : invariant(false) : void 0;
-	    !(nextValue && typeof nextValue === 'object') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): %s expects a target of type \'object\'; got %s', COMMAND_MERGE, nextValue) : invariant(false) : void 0;
-	    _assign(nextValue, spec[COMMAND_MERGE]);
-	  }
-	
-	  if (hasOwnProperty.call(spec, COMMAND_PUSH)) {
-	    invariantArrayCase(value, spec, COMMAND_PUSH);
-	    spec[COMMAND_PUSH].forEach(function (item) {
-	      nextValue.push(item);
-	    });
-	  }
-	
-	  if (hasOwnProperty.call(spec, COMMAND_UNSHIFT)) {
-	    invariantArrayCase(value, spec, COMMAND_UNSHIFT);
-	    spec[COMMAND_UNSHIFT].forEach(function (item) {
-	      nextValue.unshift(item);
-	    });
-	  }
-	
-	  if (hasOwnProperty.call(spec, COMMAND_SPLICE)) {
-	    !Array.isArray(value) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Expected %s target to be an array; got %s', COMMAND_SPLICE, value) : invariant(false) : void 0;
-	    !Array.isArray(spec[COMMAND_SPLICE]) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array of arrays; got %s. ' + 'Did you forget to wrap your parameters in an array?', COMMAND_SPLICE, spec[COMMAND_SPLICE]) : invariant(false) : void 0;
-	    spec[COMMAND_SPLICE].forEach(function (args) {
-	      !Array.isArray(args) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be an array of arrays; got %s. ' + 'Did you forget to wrap your parameters in an array?', COMMAND_SPLICE, spec[COMMAND_SPLICE]) : invariant(false) : void 0;
-	      nextValue.splice.apply(nextValue, args);
-	    });
-	  }
-	
-	  if (hasOwnProperty.call(spec, COMMAND_APPLY)) {
-	    !(typeof spec[COMMAND_APPLY] === 'function') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'update(): expected spec of %s to be a function; got %s.', COMMAND_APPLY, spec[COMMAND_APPLY]) : invariant(false) : void 0;
-	    nextValue = spec[COMMAND_APPLY](nextValue);
-	  }
-	
-	  for (var k in spec) {
-	    if (!(ALL_COMMANDS_SET.hasOwnProperty(k) && ALL_COMMANDS_SET[k])) {
-	      nextValue[k] = update(value[k], spec[k]);
-	    }
-	  }
-	
-	  return nextValue;
-	}
-	
-	module.exports = update;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 3)))
-
-/***/ },
+/* 245 */,
+/* 246 */,
+/* 247 */,
 /* 248 */
 /*!********************!*\
   !*** ./app/api.js ***!
@@ -28294,31 +28110,36 @@
 			post('/api/task/update', {
 				_id: data.id,
 				title: data.title,
-				desc: data.description,
+				desc: data.desc,
 				completed: data.completed
 			}).then(_actions2.default.updatedTask.bind(_actions2.default));
 		},
 		deleteTask: function deleteTask(id) {
-			id = id.trim();
 			if (id === '') return;
 			post('/api/task/delete', {
 				_id: id
 			}, 'DELETE').then(_actions2.default.deletedTask.bind(_actions2.default));
 		},
 	
-		saveTask: function saveTask(title, desc) {
-			title = title.trim();
-			if (typeof desc === "undefined") desc = "";
-			desc = desc.trim();
+		createTask: function createTask(data) {
+			var title = data.title.trim();
+			if (typeof data.desc === "undefined") data.desc = "";
+			var desc = data.desc.trim();
 			if (title === '') return;
-			console.log({
-				title: title,
-				desc: desc
-			});
 			post('/api/task/create', {
 				title: title,
-				desc: desc
+				desc: desc,
+				lists: data.lists
 			}).then(_actions2.default.createdTask.bind(_actions2.default));
+		},
+		createList: function createList(data) {
+			var title = data.title.trim();
+			var desc = data.desc.trim();
+			if (title === '') return;
+			post('/api/list/create', {
+				title: title,
+				desc: desc
+			}).then(_actions2.default.createdList.bind(_actions2.default));
 		}
 	};
 	
@@ -28328,7 +28149,7 @@
 	_dispatcher2.default.register(function (action) {
 		switch (action.actionType) {
 			case _constants2.default.CREATE_TASK:
-				API.saveTask(action.data);
+				API.createTask(action.data);
 				break;
 				break;
 			case _constants2.default.UPDATE_TASK:
@@ -28336,6 +28157,16 @@
 				break;
 			case _constants2.default.DELETE_TASK:
 				API.deleteTask(action.data);
+				break;
+			case _constants2.default.CREATE_LIST:
+				API.createList(action.data);
+				break;
+				break;
+			case _constants2.default.UPDATE_LIST:
+				API.updateList(action.data);
+				break;
+			case _constants2.default.DELETE_LIST:
+				API.deleteList(action.data);
 				break;
 		}
 	});
@@ -28362,6 +28193,476 @@
 			return res.json();
 		});
 	}
+
+/***/ },
+/* 249 */
+/*!************************************!*\
+  !*** ./app/components/ListForm.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _ListBarItem = __webpack_require__(/*! ./ListBarItem */ 267);
+	
+	var _ListBarItem2 = _interopRequireDefault(_ListBarItem);
+	
+	var _actions = __webpack_require__(/*! ../actions */ 231);
+	
+	var _actions2 = _interopRequireDefault(_actions);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var defaultList = {
+	  title: "Untitled List",
+	  desc: "Default Untitled List"
+	};
+	
+	var ListForm = function (_React$Component) {
+	  _inherits(ListForm, _React$Component);
+	
+	  function ListForm() {
+	    _classCallCheck(this, ListForm);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ListForm).call(this));
+	
+	    _this.state = {
+	      title: '',
+	      desc: '',
+	      addingList: false
+	    };
+	    _this.handleChange = _this.handleChange.bind(_this);
+	    _this.createList = _this.createList.bind(_this);
+	    return _this;
+	  }
+	  // lists
+	
+	
+	  _createClass(ListForm, [{
+	    key: 'handleChange',
+	    value: function handleChange(e) {
+	      if (e.target.name === "title") this.setState({ title: e.target.value });else if (e.target.name === "desc") {
+	        this.setState({ desc: e.target.value });
+	      }
+	    }
+	  }, {
+	    key: 'addList',
+	    value: function addList() {
+	      this.setState({ addingList: true });
+	    }
+	  }, {
+	    key: 'createList',
+	    value: function createList() {
+	      _actions2.default.createList({
+	        title: this.state.title,
+	        desc: this.state.desc
+	      });
+	    }
+	    // deleteList(id) {
+	    //   actions.deleteList(id);
+	    // }
+	    // updateList(id, title, desc, completed) {
+	    //   if (typeof desc === "undefined") desc = "";
+	    //   console.log("taskUpdate", id, title, desc, completed);
+	    //   actions.updateList({id: id, title: title, description: desc, completed: completed});
+	    // }
+	
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'list-form' },
+	        _react2.default.createElement('input', { className: 'list-title-field',
+	          type: 'text',
+	          name: 'title',
+	          value: this.state.title,
+	          onChange: this.handleChange }),
+	        _react2.default.createElement('input', { className: 'list-desc-field',
+	          type: 'text',
+	          name: 'desc',
+	          value: this.state.desc,
+	          onChange: this.handleChange }),
+	        _react2.default.createElement(
+	          'button',
+	          { className: 'list-create-button',
+	            onClick: this.createList },
+	          'Create List'
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return ListForm;
+	}(_react2.default.Component);
+	
+	exports.default = ListForm;
+
+/***/ },
+/* 250 */
+/*!*********************************!*\
+  !*** ./app/stores/listStore.js ***!
+  \*********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var constants = __webpack_require__(/*! ../constants */ 236);
+	
+	var ListStore = module.exports = __webpack_require__(/*! ./store.js */ 238).extend({
+		init: function init() {
+			this.bind(constants.GOT_LISTS, this.set);
+			this.bind(constants.CREATED_LIST, this.set);
+			this.bind(constants.UPDATED_LIST, this.set);
+			this.bind(constants.DELETED_LIST, this.set);
+		}
+	});
+
+/***/ },
+/* 251 */
+/*!*********************************!*\
+  !*** ./app/components/Lists.js ***!
+  \*********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _actions = __webpack_require__(/*! ../actions */ 231);
+	
+	var _actions2 = _interopRequireDefault(_actions);
+	
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 250);
+	
+	var _listStore2 = _interopRequireDefault(_listStore);
+	
+	var _ListBar = __webpack_require__(/*! ./ListBar */ 244);
+	
+	var _ListBar2 = _interopRequireDefault(_ListBar);
+	
+	var _ListForm = __webpack_require__(/*! ./ListForm */ 249);
+	
+	var _ListForm2 = _interopRequireDefault(_ListForm);
+	
+	var _reactRouter = __webpack_require__(/*! react-router */ 168);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Lists = function (_React$Component) {
+	  _inherits(Lists, _React$Component);
+	
+	  function Lists() {
+	    _classCallCheck(this, Lists);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Lists).call(this));
+	
+	    _this.state = {
+	      lists: _listStore2.default.all()
+	    };
+	    _this.onChange = _this.onChange.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(Lists, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      _listStore2.default.addChangeListener(this.onChange);
+	    }
+	  }, {
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {
+	      _listStore2.default.removeChangeListener(this.onChange);
+	    }
+	  }, {
+	    key: 'onChange',
+	    value: function onChange() {
+	      this.setState({
+	        lists: _listStore2.default.all()
+	      });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var lists = [];
+	      if (typeof this.state.lists != "undefined") {
+	        for (var i = 0; i < this.state.lists.length; i++) {
+	          var list = this.state.lists[i];
+	          lists.push(_react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: '/list/' + list._id },
+	            list.title
+	          ));
+	        };
+	      }
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(_ListForm2.default, null),
+	        lists
+	      );
+	    }
+	  }]);
+	
+	  return Lists;
+	}(_react2.default.Component);
+	
+	exports.default = Lists;
+
+/***/ },
+/* 252 */
+/*!***********************************!*\
+  !*** ./app/components/NoMatch.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var NoMatch = function (_React$Component) {
+	  _inherits(NoMatch, _React$Component);
+	
+	  function NoMatch() {
+	    _classCallCheck(this, NoMatch);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(NoMatch).apply(this, arguments));
+	  }
+	
+	  _createClass(NoMatch, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        'Oops, this page does not exist!'
+	      );
+	    }
+	  }]);
+	
+	  return NoMatch;
+	}(_react2.default.Component);
+	
+	exports.default = NoMatch;
+
+/***/ },
+/* 253 */,
+/* 254 */,
+/* 255 */,
+/* 256 */,
+/* 257 */,
+/* 258 */,
+/* 259 */,
+/* 260 */,
+/* 261 */,
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */
+/*!***************************************!*\
+  !*** ./app/components/ListBarItem.js ***!
+  \***************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var List = function (_React$Component) {
+	  _inherits(List, _React$Component);
+	
+	  function List() {
+	    _classCallCheck(this, List);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(List).call(this));
+	
+	    _this.activate = _this.activate.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(List, [{
+	    key: "activate",
+	    value: function activate() {
+	      this.props.setActive(this.props.list._id);
+	    }
+	  }, {
+	    key: "render",
+	    value: function render() {
+	      return _react2.default.createElement(
+	        "li",
+	        { className: "list", onClick: this.activate },
+	        _react2.default.createElement(
+	          "span",
+	          { className: "list__title" },
+	          this.props.list.title
+	        ),
+	        _react2.default.createElement(
+	          "span",
+	          { className: "list__desc" },
+	          this.props.list.desc
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return List;
+	}(_react2.default.Component);
+	
+	exports.default = List;
+
+/***/ },
+/* 268 */
+/*!**************************************!*\
+  !*** ./app/components/ListDetail.js ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 250);
+	
+	var _listStore2 = _interopRequireDefault(_listStore);
+	
+	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 237);
+	
+	var _taskStore2 = _interopRequireDefault(_taskStore);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var ListDetail = function (_React$Component) {
+	  _inherits(ListDetail, _React$Component);
+	
+	  function ListDetail() {
+	    _classCallCheck(this, ListDetail);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ListDetail).call(this));
+	
+	    _this.state = {
+	      list: {},
+	      tasks: []
+	    };
+	    _this.onChange = _this.onChange.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(ListDetail, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.onChange();
+	      _taskStore2.default.addChangeListener(this.onChange);
+	      _listStore2.default.addChangeListener(this.onChange);
+	    }
+	  }, {
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {
+	      _taskStore2.default.removeChangeListener(this.onChange);
+	      _listStore2.default.removeChangeListener(this.onChange);
+	    }
+	  }, {
+	    key: 'onChange',
+	    value: function onChange() {
+	      this.setState({
+	        list: _listStore2.default.get(this.props.params.id),
+	        tasks: _taskStore2.default.getByListId(this.props.params.id)
+	      });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      console.log(this.state.list);
+	      console.log(this.state.tasks);
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        this.state.list.toString()
+	      );
+	    }
+	  }]);
+	
+	  return ListDetail;
+	}(_react2.default.Component);
+	
+	exports.default = ListDetail;
 
 /***/ }
 /******/ ]);

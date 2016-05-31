@@ -26,7 +26,7 @@ var storeMethods = {
 	},
 	get: function(id) {
 		return this._data.filter(function(item) {
-			return item.Id === id;
+			return item._id === id;
 		})[0];
 	},
 	addChangeListener: function(fn) {

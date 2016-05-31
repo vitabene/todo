@@ -15,30 +15,35 @@ var API = {
 		post('/api/task/update', {
 			_id: data.id,
 			title: data.title,
-			desc: data.description,
+			desc: data.desc,
 			completed: data.completed,
 		}).then(actions.updatedTask.bind(actions));
 	},
 	deleteTask(id) {
-		id = id.trim();
 		if (id === '') return;
 		post('/api/task/delete', {
 			_id: id
 		}, 'DELETE').then(actions.deletedTask.bind(actions));
 	},
-	saveTask: function(title, desc) {
-		title = title.trim();
-		if (typeof desc === "undefined") desc = "";
-		desc = desc.trim();
+	createTask: function(data) {
+		let title = data.title.trim();
+		if (typeof data.desc === "undefined") data.desc = "";
+		let desc = data.desc.trim();
 		if (title === '') return;
-		console.log({
-			title: title,
-			desc: desc
-		});
 		post('/api/task/create', {
 			title: title,
-			desc: desc
+			desc: desc,
+			lists: data.lists
 		}).then(actions.createdTask.bind(actions));
+	},
+	createList: function(data) {
+		let title = data.title.trim();
+		let desc = data.desc.trim();
+		if (title === '') return;
+		post('/api/list/create', {
+			title: title,
+			desc: desc
+		}).then(actions.createdList.bind(actions));
 	}
 };
 
@@ -47,7 +52,7 @@ export default API
 Dispatcher.register(function(action){
 	switch (action.actionType) {
 		case constants.CREATE_TASK:
-				API.saveTask(action.data);
+				API.createTask(action.data);
 				break;
 			break;
 		case constants.UPDATE_TASK:
@@ -55,6 +60,16 @@ Dispatcher.register(function(action){
 				break;
 		case constants.DELETE_TASK:
 				API.deleteTask(action.data);
+				break;
+		case constants.CREATE_LIST:
+				API.createList(action.data);
+				break;
+			break;
+		case constants.UPDATE_LIST:
+				API.updateList(action.data);
+				break;
+		case constants.DELETE_LIST:
+				API.deleteList(action.data);
 				break;
 	}
 });

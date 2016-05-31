@@ -17,5 +17,11 @@ var TaskStore = module.exports = require('./store.js').extend({
 		// return this._data.filter(function(task) {
 			// return task.completed == 0;
 		// });
+	},
+	getByListId: function(id) {
+		var listTasks = [];
+		return this._data.filter(function(task) {
+			return task.lists.indexOf(id) !== -1;
+		});
 	}
 });
