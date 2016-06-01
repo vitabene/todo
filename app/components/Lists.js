@@ -1,7 +1,5 @@
 import React, { PropTypes } from 'react'
-import actions from '../actions'
 import ListStore from '../stores/listStore'
-import ListBar from './ListBar'
 import ListForm from './ListForm'
 import {Link} from 'react-router'
 
@@ -27,11 +25,10 @@ class Lists extends React.Component {
   render () {
     let lists = [];
     if (typeof this.state.lists != "undefined") {
-      for (let i = 0; i < this.state.lists.length; i++) {
-        let list = this.state.lists[i];
-        lists.push(<li className="list"><Link key={list._id} 
-                      to={`/list/${list._id}`}>{list.title}</Link></li>);
-      };
+      this.state.lists.forEach(function(list) {
+        lists.push(<li className="list" key={list._id}>
+                  <Link to={`/list/${list._id}`}>{list.title}</Link></li>);
+      });
     }
     return (
       <div id="listsView">

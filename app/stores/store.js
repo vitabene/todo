@@ -1,7 +1,8 @@
-var assign = require('object-assign');
-var EventEmitterProto = require('events').EventEmitter.prototype;
-const CHANGE_EVENT = 'CHANGE';
+import assign from 'object-assign'
+import EventEmitter from 'events'
 import Dispatcher from '../dispatcher'
+
+const CHANGE_EVENT = 'CHANGE';
 
 var storeMethods = {
 	init: function() {},
@@ -52,8 +53,7 @@ exports.extend = function(methods) {
 		_data: [],
 		actions: {}
 	};
-
-	assign(store, EventEmitterProto, storeMethods, methods);
+	assign(store, EventEmitter.prototype, storeMethods, methods);
 
 	store.init();
 

@@ -23,7 +23,7 @@ MongoClient.connect(url, function (err, db) {
 });
 
 // task - title, desc, completed, lists - lists_id
-// list - title, desc, tasks_id
+// list - title, desc
 
 app.get('/api/tasks', function(req, res){
   getTasks(req,res);

@@ -63,52 +63,86 @@
 	
 	var _App2 = _interopRequireDefault(_App);
 	
-	var _Home = __webpack_require__(/*! ./components/Home */ 230);
+	var _Home = __webpack_require__(/*! ./components/Home */ 231);
 	
 	var _Home2 = _interopRequireDefault(_Home);
 	
-	var _Welcome = __webpack_require__(/*! ./components/Welcome */ 257);
+	var _Welcome = __webpack_require__(/*! ./components/Welcome */ 251);
 	
 	var _Welcome2 = _interopRequireDefault(_Welcome);
 	
-	var _Lists = __webpack_require__(/*! ./components/Lists */ 247);
+	var _Lists = __webpack_require__(/*! ./components/Lists */ 252);
 	
 	var _Lists2 = _interopRequireDefault(_Lists);
 	
-	var _ListDetail = __webpack_require__(/*! ./components/ListDetail */ 248);
+	var _ListDetail = __webpack_require__(/*! ./components/ListDetail */ 253);
 	
 	var _ListDetail2 = _interopRequireDefault(_ListDetail);
 	
-	var _TaskDetail = __webpack_require__(/*! ./components/TaskDetail */ 249);
+	var _TaskDetail = __webpack_require__(/*! ./components/TaskDetail */ 254);
 	
 	var _TaskDetail2 = _interopRequireDefault(_TaskDetail);
 	
-	var _NoMatch = __webpack_require__(/*! ./components/NoMatch */ 250);
+	var _NoMatch = __webpack_require__(/*! ./components/NoMatch */ 255);
 	
 	var _NoMatch2 = _interopRequireDefault(_NoMatch);
 	
-	var _api = __webpack_require__(/*! ./api */ 251);
+	var _api = __webpack_require__(/*! ./api */ 256);
 	
 	var _api2 = _interopRequireDefault(_api);
 	
+	var _dispatcher = __webpack_require__(/*! ./dispatcher */ 235);
+	
+	var _dispatcher2 = _interopRequireDefault(_dispatcher);
+	
+	var _constants = __webpack_require__(/*! ./constants */ 233);
+	
+	var _constants2 = _interopRequireDefault(_constants);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	_api2.default.fetchLists();
-	_api2.default.fetchTasks();
+	var Api = new _api2.default();
+	Api.fetchLists();
+	Api.fetchTasks();
+	
+	_dispatcher2.default.register(function (action) {
+			switch (action.actionType) {
+					case _constants2.default.CREATE_TASK:
+							Api.createTask(action.data);
+							break;
+							break;
+					case _constants2.default.UPDATE_TASK:
+							Api.updateTask(action.data);
+							break;
+					case _constants2.default.DELETE_TASK:
+							Api.deleteTask(action.data);
+							break;
+					case _constants2.default.CREATE_LIST:
+							Api.createList(action.data);
+							break;
+							break;
+					case _constants2.default.UPDATE_LIST:
+							Api.updateList(action.data);
+							break;
+					case _constants2.default.DELETE_LIST:
+							Api.deleteList(action.data);
+							break;
+			}
+	});
 	
 	_reactDom2.default.render(_react2.default.createElement(
-	  _reactRouter.Router,
-	  { history: _reactRouter.browserHistory },
-	  _react2.default.createElement(
-	    _reactRouter.Route,
-	    { path: '/', component: _App2.default },
-	    _react2.default.createElement(_reactRouter.IndexRoute, { component: _Welcome2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'tabs', component: _Home2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'lists', component: _Lists2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: '/list/:id', component: _ListDetail2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: '/task/:id', component: _TaskDetail2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: '*', component: _NoMatch2.default })
-	  )
+			_reactRouter.Router,
+			{ history: _reactRouter.browserHistory },
+			_react2.default.createElement(
+					_reactRouter.Route,
+					{ path: '/', component: _App2.default },
+					_react2.default.createElement(_reactRouter.IndexRoute, { component: _Welcome2.default }),
+					_react2.default.createElement(_reactRouter.Route, { path: 'tabs', component: _Home2.default }),
+					_react2.default.createElement(_reactRouter.Route, { path: 'lists', component: _Lists2.default }),
+					_react2.default.createElement(_reactRouter.Route, { path: '/list/:id', component: _ListDetail2.default }),
+					_react2.default.createElement(_reactRouter.Route, { path: '/task/:id', component: _TaskDetail2.default }),
+					_react2.default.createElement(_reactRouter.Route, { path: '*', component: _NoMatch2.default })
+			)
 	), document.getElementById('app'));
 
 /***/ },
@@ -26593,7 +26627,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _NavBar = __webpack_require__(/*! ./NavBar */ 256);
+	var _NavBar = __webpack_require__(/*! ./NavBar */ 230);
 	
 	var _NavBar2 = _interopRequireDefault(_NavBar);
 	
@@ -26637,6 +26671,77 @@
 
 /***/ },
 /* 230 */
+/*!**********************************!*\
+  !*** ./app/components/NavBar.js ***!
+  \**********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(/*! react-router */ 168);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var NavBar = function (_React$Component) {
+	  _inherits(NavBar, _React$Component);
+	
+	  function NavBar() {
+	    _classCallCheck(this, NavBar);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(NavBar).apply(this, arguments));
+	  }
+	
+	  _createClass(NavBar, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'ul',
+	        { className: 'nav-bar' },
+	        _react2.default.createElement(
+	          'li',
+	          null,
+	          _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: 'lists' },
+	            'Lists'
+	          )
+	        ),
+	        _react2.default.createElement(
+	          'li',
+	          null,
+	          _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: 'tabs' },
+	            'Tabs'
+	          )
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return NavBar;
+	}(_react2.default.Component);
+	
+	exports.default = NavBar;
+
+/***/ },
+/* 231 */
 /*!********************************!*\
   !*** ./app/components/Home.js ***!
   \********************************/
@@ -26654,23 +26759,23 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 231);
+	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 232);
 	
 	var _taskStore2 = _interopRequireDefault(_taskStore);
 	
-	var _listStore = __webpack_require__(/*! ../stores/listStore */ 240);
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 241);
 	
 	var _listStore2 = _interopRequireDefault(_listStore);
 	
-	var _TaskList = __webpack_require__(/*! ./TaskList */ 241);
+	var _TaskList = __webpack_require__(/*! ./TaskList */ 242);
 	
 	var _TaskList2 = _interopRequireDefault(_TaskList);
 	
-	var _ListBar = __webpack_require__(/*! ./ListBar */ 244);
+	var _ListBar = __webpack_require__(/*! ./ListBar */ 248);
 	
 	var _ListBar2 = _interopRequireDefault(_ListBar);
 	
-	var _ListForm = __webpack_require__(/*! ./ListForm */ 245);
+	var _ListForm = __webpack_require__(/*! ./ListForm */ 249);
 	
 	var _ListForm2 = _interopRequireDefault(_ListForm);
 	
@@ -26753,7 +26858,7 @@
 	exports.default = Home;
 
 /***/ },
-/* 231 */
+/* 232 */
 /*!*********************************!*\
   !*** ./app/stores/taskStore.js ***!
   \*********************************/
@@ -26761,9 +26866,9 @@
 
 	'use strict';
 	
-	var constants = __webpack_require__(/*! ../constants */ 232);
+	var constants = __webpack_require__(/*! ../constants */ 233);
 	
-	var TaskStore = module.exports = __webpack_require__(/*! ./store.js */ 233).extend({
+	var TaskStore = module.exports = __webpack_require__(/*! ./store.js */ 234).extend({
 		init: function init() {
 			this.bind(constants.GOT_TASKS, this.set);
 			this.bind(constants.CREATED_TASK, this.set);
@@ -26790,7 +26895,7 @@
 	});
 
 /***/ },
-/* 232 */
+/* 233 */
 /*!**************************!*\
   !*** ./app/constants.js ***!
   \**************************/
@@ -26826,7 +26931,7 @@
 	};
 
 /***/ },
-/* 233 */
+/* 234 */
 /*!*****************************!*\
   !*** ./app/stores/store.js ***!
   \*****************************/
@@ -26834,16 +26939,21 @@
 
 	'use strict';
 	
-	var _dispatcher = __webpack_require__(/*! ../dispatcher */ 234);
+	var _objectAssign = __webpack_require__(/*! object-assign */ 239);
+	
+	var _objectAssign2 = _interopRequireDefault(_objectAssign);
+	
+	var _events = __webpack_require__(/*! events */ 240);
+	
+	var _events2 = _interopRequireDefault(_events);
+	
+	var _dispatcher = __webpack_require__(/*! ../dispatcher */ 235);
 	
 	var _dispatcher2 = _interopRequireDefault(_dispatcher);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var assign = __webpack_require__(/*! object-assign */ 238);
-	var EventEmitterProto = __webpack_require__(/*! events */ 239).EventEmitter.prototype;
 	var CHANGE_EVENT = 'CHANGE';
-	
 	
 	var storeMethods = {
 		init: function init() {},
@@ -26894,8 +27004,7 @@
 			_data: [],
 			actions: {}
 		};
-	
-		assign(store, EventEmitterProto, storeMethods, methods);
+		(0, _objectAssign2.default)(store, _events2.default.prototype, storeMethods, methods);
 	
 		store.init();
 	
@@ -26912,7 +27021,7 @@
 	};
 
 /***/ },
-/* 234 */
+/* 235 */
 /*!***************************!*\
   !*** ./app/dispatcher.js ***!
   \***************************/
@@ -26924,7 +27033,7 @@
 		value: true
 	});
 	
-	var _flux = __webpack_require__(/*! flux */ 235);
+	var _flux = __webpack_require__(/*! flux */ 236);
 	
 	var _flux2 = _interopRequireDefault(_flux);
 	
@@ -26940,7 +27049,7 @@
 	exports.default = Dispatcher;
 
 /***/ },
-/* 235 */
+/* 236 */
 /*!*************************!*\
   !*** ./~/flux/index.js ***!
   \*************************/
@@ -26955,11 +27064,11 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 	
-	module.exports.Dispatcher = __webpack_require__(/*! ./lib/Dispatcher */ 236);
+	module.exports.Dispatcher = __webpack_require__(/*! ./lib/Dispatcher */ 237);
 
 
 /***/ },
-/* 236 */
+/* 237 */
 /*!**********************************!*\
   !*** ./~/flux/lib/Dispatcher.js ***!
   \**********************************/
@@ -26984,7 +27093,7 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 	
-	var invariant = __webpack_require__(/*! fbjs/lib/invariant */ 237);
+	var invariant = __webpack_require__(/*! fbjs/lib/invariant */ 238);
 	
 	var _prefix = 'ID_';
 	
@@ -27199,7 +27308,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 3)))
 
 /***/ },
-/* 237 */
+/* 238 */
 /*!****************************************!*\
   !*** ./~/flux/~/fbjs/lib/invariant.js ***!
   \****************************************/
@@ -27257,7 +27366,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 3)))
 
 /***/ },
-/* 238 */
+/* 239 */
 /*!**********************************!*\
   !*** ./~/object-assign/index.js ***!
   \**********************************/
@@ -27349,7 +27458,7 @@
 
 
 /***/ },
-/* 239 */
+/* 240 */
 /*!********************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/events/events.js ***!
   \********************************************************/
@@ -27656,7 +27765,7 @@
 
 
 /***/ },
-/* 240 */
+/* 241 */
 /*!*********************************!*\
   !*** ./app/stores/listStore.js ***!
   \*********************************/
@@ -27664,9 +27773,9 @@
 
 	'use strict';
 	
-	var constants = __webpack_require__(/*! ../constants */ 232);
+	var constants = __webpack_require__(/*! ../constants */ 233);
 	
-	var ListStore = module.exports = __webpack_require__(/*! ./store.js */ 233).extend({
+	var ListStore = module.exports = __webpack_require__(/*! ./store.js */ 234).extend({
 		init: function init() {
 			this.bind(constants.GOT_LISTS, this.set);
 			this.bind(constants.CREATED_LIST, this.set);
@@ -27682,7 +27791,7 @@
 	});
 
 /***/ },
-/* 241 */
+/* 242 */
 /*!************************************!*\
   !*** ./app/components/TaskList.js ***!
   \************************************/
@@ -27700,11 +27809,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _TaskForm = __webpack_require__(/*! ./TaskForm */ 252);
+	var _TaskForm = __webpack_require__(/*! ./TaskForm */ 243);
 	
 	var _TaskForm2 = _interopRequireDefault(_TaskForm);
 	
-	var _actions = __webpack_require__(/*! ../actions */ 243);
+	var _actions = __webpack_require__(/*! ../actions */ 247);
 	
 	var _actions2 = _interopRequireDefault(_actions);
 	
@@ -27841,8 +27950,313 @@
 	exports.default = TaskList;
 
 /***/ },
-/* 242 */,
 /* 243 */
+/*!************************************!*\
+  !*** ./app/components/TaskForm.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _EditDeleteButtons = __webpack_require__(/*! ./EditDeleteButtons */ 244);
+	
+	var _EditDeleteButtons2 = _interopRequireDefault(_EditDeleteButtons);
+	
+	var _CancelSaveButtons = __webpack_require__(/*! ./CancelSaveButtons */ 245);
+	
+	var _CancelSaveButtons2 = _interopRequireDefault(_CancelSaveButtons);
+	
+	var _CheckBox = __webpack_require__(/*! ./CheckBox */ 246);
+	
+	var _CheckBox2 = _interopRequireDefault(_CheckBox);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var TaskForm = function (_React$Component) {
+	  _inherits(TaskForm, _React$Component);
+	
+	  function TaskForm() {
+	    _classCallCheck(this, TaskForm);
+	
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TaskForm).call(this));
+	
+	    _this.state = {
+	      title: '',
+	      desc: '',
+	      id: ''
+	    };
+	    _this.handleChange = _this.handleChange.bind(_this);
+	    _this.delete = _this.delete.bind(_this);
+	    _this.completeEdit = _this.completeEdit.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(TaskForm, [{
+	    key: 'edit',
+	    value: function edit() {
+	      this.setState({ edited: true });
+	    }
+	  }, {
+	    key: 'handleChange',
+	    value: function handleChange(e) {
+	      if (e.target.name === "title") this.setState({
+	        title: e.target.value
+	      });else if (e.target.name === "desc") {
+	        this.setState({
+	          desc: e.target.value
+	        });
+	      }
+	    }
+	  }, {
+	    key: 'completeEdit',
+	    value: function completeEdit() {
+	      // new task, no id
+	      if (this.state.id === 0) {
+	        this.props.createTask(this.state.title, this.state.desc);
+	        this.props.taskAdded();
+	      } else {
+	        this.props.createTask(this.state.id, this.state.title, this.state.desc, 0);
+	      }
+	      this.setState({ edited: false });
+	    }
+	  }, {
+	    key: 'delete',
+	    value: function _delete() {
+	      this.props.delete(this.state.id);
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this.setState({
+	        id: this.props.task ? this.props.task._id : '',
+	        title: this.props.task ? this.props.task.title : '',
+	        desc: this.props.task ? this.props.task.description : '',
+	        completed: this.props.task ? this.props.task.completed : ''
+	      });
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var buttons = _react2.default.createElement(_CancelSaveButtons2.default, { cancel: this.props.taskAdded, save: this.completeEdit });
+	      var checked = false;
+	      if (this.state.completed == 1) checked = true;
+	      return _react2.default.createElement(
+	        'li',
+	        { className: 'task' },
+	        _react2.default.createElement(_CheckBox2.default, { checked: checked, click: this.complete }),
+	        _react2.default.createElement('input', { className: 'task__title',
+	          name: 'title',
+	          onChange: this.handleChange,
+	          value: this.state.title }),
+	        _react2.default.createElement('input', { className: 'task__desc',
+	          name: 'desc',
+	          onChange: this.handleChange,
+	          value: this.state.desc }),
+	        buttons
+	      );
+	    }
+	  }]);
+	
+	  return TaskForm;
+	}(_react2.default.Component);
+	
+	exports.default = TaskForm;
+
+/***/ },
+/* 244 */
+/*!*********************************************!*\
+  !*** ./app/components/EditDeleteButtons.js ***!
+  \*********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var EditDeleteButtons = function (_React$Component) {
+	  _inherits(EditDeleteButtons, _React$Component);
+	
+	  function EditDeleteButtons() {
+	    _classCallCheck(this, EditDeleteButtons);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(EditDeleteButtons).apply(this, arguments));
+	  }
+	
+	  _createClass(EditDeleteButtons, [{
+	    key: "render",
+	    value: function render() {
+	      return _react2.default.createElement(
+	        "div",
+	        { className: "task__buttons" },
+	        _react2.default.createElement(
+	          "button",
+	          { className: "edit-button",
+	            onClick: this.props.edit },
+	          "Edit"
+	        ),
+	        _react2.default.createElement(
+	          "button",
+	          { className: "delete-button",
+	            onClick: this.props.delete },
+	          "Delete"
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return EditDeleteButtons;
+	}(_react2.default.Component);
+	
+	exports.default = EditDeleteButtons;
+
+/***/ },
+/* 245 */
+/*!*********************************************!*\
+  !*** ./app/components/CancelSaveButtons.js ***!
+  \*********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var CancelSaveButtons = function (_React$Component) {
+	  _inherits(CancelSaveButtons, _React$Component);
+	
+	  function CancelSaveButtons() {
+	    _classCallCheck(this, CancelSaveButtons);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(CancelSaveButtons).apply(this, arguments));
+	  }
+	
+	  _createClass(CancelSaveButtons, [{
+	    key: "render",
+	    value: function render() {
+	      return _react2.default.createElement(
+	        "div",
+	        { className: "task__buttons" },
+	        _react2.default.createElement(
+	          "button",
+	          { className: "save-button",
+	            onClick: this.props.save },
+	          "Save"
+	        ),
+	        _react2.default.createElement(
+	          "button",
+	          { className: "cancel-button",
+	            onClick: this.props.cancel },
+	          "Cancel"
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return CancelSaveButtons;
+	}(_react2.default.Component);
+	
+	exports.default = CancelSaveButtons;
+
+/***/ },
+/* 246 */
+/*!************************************!*\
+  !*** ./app/components/CheckBox.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var CheckBox = function (_React$Component) {
+	  _inherits(CheckBox, _React$Component);
+	
+	  function CheckBox() {
+	    _classCallCheck(this, CheckBox);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(CheckBox).apply(this, arguments));
+	  }
+	
+	  _createClass(CheckBox, [{
+	    key: "render",
+	    value: function render() {
+	      return _react2.default.createElement("input", { className: "task__checkbox",
+	        type: "checkbox",
+	        checked: this.props.checked,
+	        onChange: this.props.click });
+	    }
+	  }]);
+	
+	  return CheckBox;
+	}(_react2.default.Component);
+	
+	exports.default = CheckBox;
+
+/***/ },
+/* 247 */
 /*!************************!*\
   !*** ./app/actions.js ***!
   \************************/
@@ -27850,13 +28264,13 @@
 
 	'use strict';
 	
-	var _dispatcher = __webpack_require__(/*! ./dispatcher */ 234);
+	var _dispatcher = __webpack_require__(/*! ./dispatcher */ 235);
 	
 	var _dispatcher2 = _interopRequireDefault(_dispatcher);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var constants = __webpack_require__(/*! ./constants */ 232);
+	var constants = __webpack_require__(/*! ./constants */ 233);
 	
 	// generating functions for actions
 	Object.keys(constants).forEach(function (key) {
@@ -27874,7 +28288,7 @@
 	});
 
 /***/ },
-/* 244 */
+/* 248 */
 /*!***********************************!*\
   !*** ./app/components/ListBar.js ***!
   \***********************************/
@@ -27894,11 +28308,11 @@
 	
 	var _reactRouter = __webpack_require__(/*! react-router */ 168);
 	
-	var _ListForm = __webpack_require__(/*! ./ListForm */ 245);
+	var _ListForm = __webpack_require__(/*! ./ListForm */ 249);
 	
 	var _ListForm2 = _interopRequireDefault(_ListForm);
 	
-	var _ListBarItem = __webpack_require__(/*! ./ListBarItem */ 246);
+	var _ListBarItem = __webpack_require__(/*! ./ListBarItem */ 250);
 	
 	var _ListBarItem2 = _interopRequireDefault(_ListBarItem);
 	
@@ -27991,7 +28405,7 @@
 	exports.default = ListBar;
 
 /***/ },
-/* 245 */
+/* 249 */
 /*!************************************!*\
   !*** ./app/components/ListForm.js ***!
   \************************************/
@@ -28009,11 +28423,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _actions = __webpack_require__(/*! ../actions */ 243);
+	var _actions = __webpack_require__(/*! ../actions */ 247);
 	
 	var _actions2 = _interopRequireDefault(_actions);
 	
-	var _CancelSaveButtons = __webpack_require__(/*! ./CancelSaveButtons */ 254);
+	var _CancelSaveButtons = __webpack_require__(/*! ./CancelSaveButtons */ 245);
 	
 	var _CancelSaveButtons2 = _interopRequireDefault(_CancelSaveButtons);
 	
@@ -28096,7 +28510,7 @@
 	exports.default = ListForm;
 
 /***/ },
-/* 246 */
+/* 250 */
 /*!***************************************!*\
   !*** ./app/components/ListBarItem.js ***!
   \***************************************/
@@ -28114,7 +28528,7 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _actions = __webpack_require__(/*! ../actions */ 243);
+	var _actions = __webpack_require__(/*! ../actions */ 247);
 	
 	var _actions2 = _interopRequireDefault(_actions);
 	
@@ -28186,7 +28600,61 @@
 	exports.default = List;
 
 /***/ },
-/* 247 */
+/* 251 */
+/*!***********************************!*\
+  !*** ./app/components/Welcome.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(/*! react-router */ 168);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Welcome = function (_React$Component) {
+	  _inherits(Welcome, _React$Component);
+	
+	  function Welcome() {
+	    _classCallCheck(this, Welcome);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Welcome).apply(this, arguments));
+	  }
+	
+	  _createClass(Welcome, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'h1',
+	        null,
+	        'Welcome to Konnektodo!'
+	      );
+	    }
+	  }]);
+	
+	  return Welcome;
+	}(_react2.default.Component);
+	
+	exports.default = Welcome;
+
+/***/ },
+/* 252 */
 /*!*********************************!*\
   !*** ./app/components/Lists.js ***!
   \*********************************/
@@ -28204,19 +28672,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _actions = __webpack_require__(/*! ../actions */ 243);
-	
-	var _actions2 = _interopRequireDefault(_actions);
-	
-	var _listStore = __webpack_require__(/*! ../stores/listStore */ 240);
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 241);
 	
 	var _listStore2 = _interopRequireDefault(_listStore);
 	
-	var _ListBar = __webpack_require__(/*! ./ListBar */ 244);
-	
-	var _ListBar2 = _interopRequireDefault(_ListBar);
-	
-	var _ListForm = __webpack_require__(/*! ./ListForm */ 245);
+	var _ListForm = __webpack_require__(/*! ./ListForm */ 249);
 	
 	var _ListForm2 = _interopRequireDefault(_ListForm);
 	
@@ -28267,19 +28727,17 @@
 	    value: function render() {
 	      var lists = [];
 	      if (typeof this.state.lists != "undefined") {
-	        for (var i = 0; i < this.state.lists.length; i++) {
-	          var list = this.state.lists[i];
+	        this.state.lists.forEach(function (list) {
 	          lists.push(_react2.default.createElement(
 	            'li',
-	            { className: 'list' },
+	            { className: 'list', key: list._id },
 	            _react2.default.createElement(
 	              _reactRouter.Link,
-	              { key: list._id,
-	                to: '/list/' + list._id },
+	              { to: '/list/' + list._id },
 	              list.title
 	            )
 	          ));
-	        };
+	        });
 	      }
 	      return _react2.default.createElement(
 	        'div',
@@ -28300,7 +28758,7 @@
 	exports.default = Lists;
 
 /***/ },
-/* 248 */
+/* 253 */
 /*!**************************************!*\
   !*** ./app/components/ListDetail.js ***!
   \**************************************/
@@ -28318,11 +28776,11 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _listStore = __webpack_require__(/*! ../stores/listStore */ 240);
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 241);
 	
 	var _listStore2 = _interopRequireDefault(_listStore);
 	
-	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 231);
+	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 232);
 	
 	var _taskStore2 = _interopRequireDefault(_taskStore);
 	
@@ -28421,7 +28879,7 @@
 	exports.default = ListDetail;
 
 /***/ },
-/* 249 */
+/* 254 */
 /*!**************************************!*\
   !*** ./app/components/TaskDetail.js ***!
   \**************************************/
@@ -28439,29 +28897,29 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _listStore = __webpack_require__(/*! ../stores/listStore */ 240);
+	var _listStore = __webpack_require__(/*! ../stores/listStore */ 241);
 	
 	var _listStore2 = _interopRequireDefault(_listStore);
 	
-	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 231);
+	var _taskStore = __webpack_require__(/*! ../stores/taskStore */ 232);
 	
 	var _taskStore2 = _interopRequireDefault(_taskStore);
 	
-	var _actions = __webpack_require__(/*! ../actions */ 243);
+	var _actions = __webpack_require__(/*! ../actions */ 247);
 	
 	var _actions2 = _interopRequireDefault(_actions);
 	
 	var _reactRouter = __webpack_require__(/*! react-router */ 168);
 	
-	var _EditDeleteButtons = __webpack_require__(/*! ./EditDeleteButtons */ 253);
+	var _EditDeleteButtons = __webpack_require__(/*! ./EditDeleteButtons */ 244);
 	
 	var _EditDeleteButtons2 = _interopRequireDefault(_EditDeleteButtons);
 	
-	var _CancelSaveButtons = __webpack_require__(/*! ./CancelSaveButtons */ 254);
+	var _CancelSaveButtons = __webpack_require__(/*! ./CancelSaveButtons */ 245);
 	
 	var _CancelSaveButtons2 = _interopRequireDefault(_CancelSaveButtons);
 	
-	var _CheckBox = __webpack_require__(/*! ./CheckBox */ 255);
+	var _CheckBox = __webpack_require__(/*! ./CheckBox */ 246);
 	
 	var _CheckBox2 = _interopRequireDefault(_CheckBox);
 	
@@ -28672,7 +29130,7 @@
 	exports.default = TaskDetail;
 
 /***/ },
-/* 250 */
+/* 255 */
 /*!***********************************!*\
   !*** ./app/components/NoMatch.js ***!
   \***********************************/
@@ -28724,7 +29182,7 @@
 	exports.default = NoMatch;
 
 /***/ },
-/* 251 */
+/* 256 */
 /*!********************!*\
   !*** ./app/api.js ***!
   \********************/
@@ -28736,500 +29194,96 @@
 		value: true
 	});
 	
-	var _actions = __webpack_require__(/*! ./actions */ 243);
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _actions = __webpack_require__(/*! ./actions */ 247);
 	
 	var _actions2 = _interopRequireDefault(_actions);
 	
-	var _dispatcher = __webpack_require__(/*! ./dispatcher */ 234);
+	var _utils = __webpack_require__(/*! ./utils */ 257);
 	
-	var _dispatcher2 = _interopRequireDefault(_dispatcher);
-	
-	var _constants = __webpack_require__(/*! ./constants */ 232);
-	
-	var _constants2 = _interopRequireDefault(_constants);
+	var _utils2 = _interopRequireDefault(_utils);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var API = {
-		fetchLists: function fetchLists() {
-			get('/api/lists').then(_actions2.default.gotLists.bind(_actions2.default));
-		},
-		fetchTasks: function fetchTasks() {
-			get('/api/tasks').then(_actions2.default.gotTasks.bind(_actions2.default));
-		},
-		updateTask: function updateTask(data) {
-			post('/api/task/update', data).then(_actions2.default.updatedTask.bind(_actions2.default));
-		},
-		deleteTask: function deleteTask(id) {
-			if (id === '') return;
-			post('/api/task/delete', {
-				_id: id
-			}, 'DELETE').then(_actions2.default.deletedTask.bind(_actions2.default));
-		},
-		deleteList: function deleteList(data) {
-			if (data._id === '') return;
-			post('/api/list/delete', {
-				_id: data._id,
-				tasks: data.tasks
-			}, 'DELETE').then(_actions2.default.deletedList.bind(_actions2.default));
-		},
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-		createTask: function createTask(data) {
-			var title = data.title.trim();
-			if (typeof data.desc === "undefined") data.desc = "";
-			var desc = data.desc.trim();
-			if (title === '') return;
-			post('/api/task/create', {
-				title: title,
-				desc: desc,
-				lists: data.lists
-			}).then(_actions2.default.createdTask.bind(_actions2.default));
-		},
-		createList: function createList(data) {
-			var title = data.title.trim();
-			var desc = data.desc.trim();
-			if (title === '') return;
-			post('/api/list/create', {
-				title: title,
-				desc: desc
-			}).then(_actions2.default.createdList.bind(_actions2.default));
+	var API = function () {
+		function API() {
+			_classCallCheck(this, API);
 		}
-	};
+	
+		_createClass(API, [{
+			key: 'fetchLists',
+			value: function fetchLists() {
+				_utils2.default.get('/api/lists').then(_actions2.default.gotLists.bind(_actions2.default));
+			}
+		}, {
+			key: 'fetchTasks',
+			value: function fetchTasks() {
+				_utils2.default.get('/api/tasks').then(_actions2.default.gotTasks.bind(_actions2.default));
+			}
+		}, {
+			key: 'updateTask',
+			value: function updateTask(data) {
+				_utils2.default.post('/api/task/update', data).then(_actions2.default.updatedTask.bind(_actions2.default));
+			}
+		}, {
+			key: 'deleteTask',
+			value: function deleteTask(id) {
+				if (id === '') return;
+				_utils2.default.post('/api/task/delete', {
+					_id: id
+				}, 'DELETE').then(_actions2.default.deletedTask.bind(_actions2.default));
+			}
+		}, {
+			key: 'deleteList',
+			value: function deleteList(data) {
+				if (data._id === '') return;
+				_utils2.default.post('/api/list/delete', {
+					_id: data._id,
+					tasks: data.tasks
+				}, 'DELETE').then(_actions2.default.deletedList.bind(_actions2.default));
+			}
+		}, {
+			key: 'createTask',
+			value: function createTask(data) {
+				if (typeof data.desc === "undefined") data.desc = "";
+				var title = data.title.trim();
+				var desc = data.desc.trim();
+	
+				if (title === '') return;
+				_utils2.default.post('/api/task/create', {
+					title: title,
+					desc: desc,
+					lists: data.lists
+				}).then(_actions2.default.createdTask.bind(_actions2.default));
+			}
+		}, {
+			key: 'createList',
+			value: function createList(data) {
+				var title = data.title.trim();
+				var desc = data.desc.trim();
+	
+				if (title === '') return;
+				_utils2.default.post('/api/list/create', {
+					title: title,
+					desc: desc
+				}).then(_actions2.default.createdList.bind(_actions2.default));
+			}
+		}]);
+	
+		return API;
+	}();
 	
 	exports.default = API;
-	
-	
-	_dispatcher2.default.register(function (action) {
-		switch (action.actionType) {
-			case _constants2.default.CREATE_TASK:
-				API.createTask(action.data);
-				break;
-				break;
-			case _constants2.default.UPDATE_TASK:
-				API.updateTask(action.data);
-				break;
-			case _constants2.default.DELETE_TASK:
-				API.deleteTask(action.data);
-				break;
-			case _constants2.default.CREATE_LIST:
-				API.createList(action.data);
-				break;
-				break;
-			case _constants2.default.UPDATE_LIST:
-				API.updateList(action.data);
-				break;
-			case _constants2.default.DELETE_LIST:
-				API.deleteList(action.data);
-				break;
-		}
-	});
-	
-	function get(url) {
-		return fetch(url, {
-			credentials: 'include'
-		}).then(function (res) {
-			return res.json();
-		});
-	}
-	
-	function post(url, body, method) {
-		if (method == null) method = 'POST';
-		return fetch(url, {
-			method: method,
-			credentials: 'include',
-			body: JSON.stringify(body || {}),
-			headers: {
-				'Content-Type': 'application/json',
-				'Accept': 'application/json'
-			}
-		}).then(function (res) {
-			return res.json();
-		});
-	}
-
-/***/ },
-/* 252 */
-/*!************************************!*\
-  !*** ./app/components/TaskForm.js ***!
-  \************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _EditDeleteButtons = __webpack_require__(/*! ./EditDeleteButtons */ 253);
-	
-	var _EditDeleteButtons2 = _interopRequireDefault(_EditDeleteButtons);
-	
-	var _CancelSaveButtons = __webpack_require__(/*! ./CancelSaveButtons */ 254);
-	
-	var _CancelSaveButtons2 = _interopRequireDefault(_CancelSaveButtons);
-	
-	var _CheckBox = __webpack_require__(/*! ./CheckBox */ 255);
-	
-	var _CheckBox2 = _interopRequireDefault(_CheckBox);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var TaskForm = function (_React$Component) {
-	  _inherits(TaskForm, _React$Component);
-	
-	  function TaskForm() {
-	    _classCallCheck(this, TaskForm);
-	
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TaskForm).call(this));
-	
-	    _this.state = {
-	      title: '',
-	      desc: '',
-	      id: ''
-	    };
-	    _this.handleChange = _this.handleChange.bind(_this);
-	    _this.delete = _this.delete.bind(_this);
-	    _this.completeEdit = _this.completeEdit.bind(_this);
-	    return _this;
-	  }
-	
-	  _createClass(TaskForm, [{
-	    key: 'edit',
-	    value: function edit() {
-	      this.setState({ edited: true });
-	    }
-	  }, {
-	    key: 'handleChange',
-	    value: function handleChange(e) {
-	      if (e.target.name === "title") this.setState({
-	        title: e.target.value
-	      });else if (e.target.name === "desc") {
-	        this.setState({
-	          desc: e.target.value
-	        });
-	      }
-	    }
-	  }, {
-	    key: 'completeEdit',
-	    value: function completeEdit() {
-	      // new task, no id
-	      if (this.state.id === 0) {
-	        this.props.createTask(this.state.title, this.state.desc);
-	        this.props.taskAdded();
-	      } else {
-	        this.props.createTask(this.state.id, this.state.title, this.state.desc, 0);
-	      }
-	      this.setState({ edited: false });
-	    }
-	  }, {
-	    key: 'delete',
-	    value: function _delete() {
-	      this.props.delete(this.state.id);
-	    }
-	  }, {
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      this.setState({
-	        id: this.props.task ? this.props.task._id : '',
-	        title: this.props.task ? this.props.task.title : '',
-	        desc: this.props.task ? this.props.task.description : '',
-	        completed: this.props.task ? this.props.task.completed : ''
-	      });
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var buttons = _react2.default.createElement(_CancelSaveButtons2.default, { cancel: this.props.taskAdded, save: this.completeEdit });
-	      var checked = false;
-	      if (this.state.completed == 1) checked = true;
-	      return _react2.default.createElement(
-	        'li',
-	        { className: 'task' },
-	        _react2.default.createElement(_CheckBox2.default, { checked: checked, click: this.complete }),
-	        _react2.default.createElement('input', { className: 'task__title',
-	          name: 'title',
-	          onChange: this.handleChange,
-	          value: this.state.title }),
-	        _react2.default.createElement('input', { className: 'task__desc',
-	          name: 'desc',
-	          onChange: this.handleChange,
-	          value: this.state.desc }),
-	        buttons
-	      );
-	    }
-	  }]);
-	
-	  return TaskForm;
-	}(_react2.default.Component);
-	
-	exports.default = TaskForm;
-
-/***/ },
-/* 253 */
-/*!*********************************************!*\
-  !*** ./app/components/EditDeleteButtons.js ***!
-  \*********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var EditDeleteButtons = function (_React$Component) {
-	  _inherits(EditDeleteButtons, _React$Component);
-	
-	  function EditDeleteButtons() {
-	    _classCallCheck(this, EditDeleteButtons);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(EditDeleteButtons).apply(this, arguments));
-	  }
-	
-	  _createClass(EditDeleteButtons, [{
-	    key: "render",
-	    value: function render() {
-	      return _react2.default.createElement(
-	        "div",
-	        { className: "task__buttons" },
-	        _react2.default.createElement(
-	          "button",
-	          { className: "edit-button",
-	            onClick: this.props.edit },
-	          "Edit"
-	        ),
-	        _react2.default.createElement(
-	          "button",
-	          { className: "delete-button",
-	            onClick: this.props.delete },
-	          "Delete"
-	        )
-	      );
-	    }
-	  }]);
-	
-	  return EditDeleteButtons;
-	}(_react2.default.Component);
-	
-	exports.default = EditDeleteButtons;
-
-/***/ },
-/* 254 */
-/*!*********************************************!*\
-  !*** ./app/components/CancelSaveButtons.js ***!
-  \*********************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var CancelSaveButtons = function (_React$Component) {
-	  _inherits(CancelSaveButtons, _React$Component);
-	
-	  function CancelSaveButtons() {
-	    _classCallCheck(this, CancelSaveButtons);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(CancelSaveButtons).apply(this, arguments));
-	  }
-	
-	  _createClass(CancelSaveButtons, [{
-	    key: "render",
-	    value: function render() {
-	      return _react2.default.createElement(
-	        "div",
-	        { className: "task__buttons" },
-	        _react2.default.createElement(
-	          "button",
-	          { className: "save-button",
-	            onClick: this.props.save },
-	          "Save"
-	        ),
-	        _react2.default.createElement(
-	          "button",
-	          { className: "cancel-button",
-	            onClick: this.props.cancel },
-	          "Cancel"
-	        )
-	      );
-	    }
-	  }]);
-	
-	  return CancelSaveButtons;
-	}(_react2.default.Component);
-	
-	exports.default = CancelSaveButtons;
-
-/***/ },
-/* 255 */
-/*!************************************!*\
-  !*** ./app/components/CheckBox.js ***!
-  \************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var CheckBox = function (_React$Component) {
-	  _inherits(CheckBox, _React$Component);
-	
-	  function CheckBox() {
-	    _classCallCheck(this, CheckBox);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(CheckBox).apply(this, arguments));
-	  }
-	
-	  _createClass(CheckBox, [{
-	    key: "render",
-	    value: function render() {
-	      return _react2.default.createElement("input", { className: "task__checkbox",
-	        type: "checkbox",
-	        checked: this.props.checked,
-	        onChange: this.props.click });
-	    }
-	  }]);
-	
-	  return CheckBox;
-	}(_react2.default.Component);
-	
-	exports.default = CheckBox;
-
-/***/ },
-/* 256 */
-/*!**********************************!*\
-  !*** ./app/components/NavBar.js ***!
-  \**********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _reactRouter = __webpack_require__(/*! react-router */ 168);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var NavBar = function (_React$Component) {
-	  _inherits(NavBar, _React$Component);
-	
-	  function NavBar() {
-	    _classCallCheck(this, NavBar);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(NavBar).apply(this, arguments));
-	  }
-	
-	  _createClass(NavBar, [{
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'ul',
-	        { className: 'nav-bar' },
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            _reactRouter.Link,
-	            { to: 'lists' },
-	            'Lists'
-	          )
-	        ),
-	        _react2.default.createElement(
-	          'li',
-	          null,
-	          _react2.default.createElement(
-	            _reactRouter.Link,
-	            { to: 'tabs' },
-	            'Tabs'
-	          )
-	        )
-	      );
-	    }
-	  }]);
-	
-	  return NavBar;
-	}(_react2.default.Component);
-	
-	exports.default = NavBar;
 
 /***/ },
 /* 257 */
-/*!***********************************!*\
-  !*** ./app/components/Welcome.js ***!
-  \***********************************/
-/***/ function(module, exports, __webpack_require__) {
+/*!**********************!*\
+  !*** ./app/utils.js ***!
+  \**********************/
+/***/ function(module, exports) {
 
 	'use strict';
 	
@@ -29239,44 +29293,44 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _react = __webpack_require__(/*! react */ 1);
-	
-	var _react2 = _interopRequireDefault(_react);
-	
-	var _reactRouter = __webpack_require__(/*! react-router */ 168);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Welcome = function (_React$Component) {
-	  _inherits(Welcome, _React$Component);
-	
-	  function Welcome() {
-	    _classCallCheck(this, Welcome);
-	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(Welcome).apply(this, arguments));
+	var Utils = function () {
+	  function Utils() {
+	    _classCallCheck(this, Utils);
 	  }
 	
-	  _createClass(Welcome, [{
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'h1',
-	        null,
-	        'Welcome to Konnektodo!'
-	      );
+	  _createClass(Utils, null, [{
+	    key: 'get',
+	    value: function get(url) {
+	      return fetch(url, {
+	        credentials: 'include'
+	      }).then(function (res) {
+	        return res.json();
+	      });
+	    }
+	  }, {
+	    key: 'post',
+	    value: function post(url, body, method) {
+	      if (method == null) method = 'POST';
+	      return fetch(url, {
+	        method: method,
+	        credentials: 'include',
+	        body: JSON.stringify(body || {}),
+	        headers: {
+	          'Content-Type': 'application/json',
+	          'Accept': 'application/json'
+	        }
+	      }).then(function (res) {
+	        return res.json();
+	      });
 	    }
 	  }]);
 	
-	  return Welcome;
-	}(_react2.default.Component);
+	  return Utils;
+	}();
 	
-	exports.default = Welcome;
+	exports.default = Utils;
 
 /***/ }
 /******/ ]);
