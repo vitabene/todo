@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "browserify ./app/main.js --node -t [ babelify --presets [ es2015 react ] ] --outfile ./build/main.js",
-    "dev": "webpack -d --watch",
+    "dev": "webpack -d --watch --optimize-minimize",
     "build": "webpack -p"
   },
   "author": "Vita Benes",

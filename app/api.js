@@ -2,10 +2,10 @@ import actions from './actions'
 import Utils from './utils'
 
 class API {
-	fetchLists() {
+	static fetchLists() {
 		Utils.get('/api/lists').then(actions.gotLists.bind(actions));
 	}
-	fetchTasks() {
+	static fetchTasks() {
 		Utils.get('/api/tasks').then(actions.gotTasks.bind(actions));
 	}
 	updateTask(data) {

@@ -19,7 +19,6 @@ var TaskStore = module.exports = require('./store.js').extend({
 		// });
 	},
 	getByListId: function(id) {
-		var listTasks = [];
 		return this._data.filter(function(task) {
 			return task.lists.indexOf(id) !== -1;
 		});

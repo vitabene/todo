@@ -3,12 +3,6 @@ import {Link} from 'react-router'
 import ListForm from './ListForm'
 import ListBarItem from './ListBarItem'
 
-const defaultList = {
-  _id: 0,
-  title : "Untitled List",
-  desc: "Default Untitled List"
-};
-
 class ListBar extends React.Component {
   constructor() {
     super();

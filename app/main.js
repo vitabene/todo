@@ -9,37 +9,9 @@ import ListDetail from './components/ListDetail'
 import TaskDetail from './components/TaskDetail'
 import NoMatch from './components/NoMatch'
 import API from './api'
-import Dispatcher from './dispatcher'
-import constants from './constants'
 
-let Api = new API();
-Api.fetchLists();
-Api.fetchTasks();
-
-Dispatcher.register(function(action){
-	switch (action.actionType) {
-		case constants.CREATE_TASK:
-				Api.createTask(action.data);
-				break;
-			break;
-		case constants.UPDATE_TASK:
-				Api.updateTask(action.data);
-				break;
-		case constants.DELETE_TASK:
-				Api.deleteTask(action.data);
-				break;
-		case constants.CREATE_LIST:
-				Api.createList(action.data);
-				break;
-			break;
-		case constants.UPDATE_LIST:
-				Api.updateList(action.data);
-				break;
-		case constants.DELETE_LIST:
-				Api.deleteList(action.data);
-				break;
-	}
-});
+API.fetchLists();
+API.fetchTasks();
 
 ReactDOM.render((
   <Router history={browserHistory}>
