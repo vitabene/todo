@@ -1,6 +1,6 @@
 import React from 'react'
-import ListStore from '../stores/listStore'
-import TaskStore from '../stores/taskStore'
+import ListStore from '../../stores/listStore'
+import TaskStore from '../../stores/taskStore'
 import {Link} from 'react-router'
 
 class ListDetail extends React.Component {
@@ -34,7 +34,7 @@ class ListDetail extends React.Component {
     if (this.state.tasks.length > 0) {
       for (var i = 0; i < this.state.tasks.length; i++) {
         let task = this.state.tasks[i];
-        taskLinks.push(<li className="list">
+        taskLinks.push(<li className="list" key={task._id}>
           <Link key={task._id} to={`/task/${task._id}`}>{task.title}</Link>
         </li>);
       }
@@ -42,7 +42,7 @@ class ListDetail extends React.Component {
     return (
       <div className="list-detail">
         <h2>{listTitle}</h2>
-        <small>{listDesc}</small>
+        <h3>{listDesc}</h3>
         <ul className="task-list">
           {taskLinks}
         </ul>

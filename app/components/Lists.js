@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import ListStore from '../stores/listStore'
-import ListForm from './ListForm'
+import ListForm from './list/ListForm'
 import {Link} from 'react-router'
 
 class Lists extends React.Component {
@@ -31,8 +31,9 @@ class Lists extends React.Component {
       });
     }
     return (
-      <div id="listsView">
+      <div className="lists" id="listsView">
         <ListForm />
+        <h2>All Lists</h2>
         <ul className="task-lists">
           {lists}
         </ul>

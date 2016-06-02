@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react'
 import TaskStore from '../stores/taskStore'
 import ListStore from '../stores/listStore'
-import TaskList from './TaskList'
-import ListBar from './ListBar'
-import ListForm from './ListForm'
+import Tasks from './task/Tasks'
+import ListBar from './list/ListBar'
+import ListForm from './list/ListForm'
 
-class Home extends React.Component {
+class Tabs extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -47,10 +47,10 @@ class Home extends React.Component {
         <ListBar activeList={this.state.activeList}
                 setActive={this.setActive}
                 lists={this.state.lists}/>
-        <TaskList activeList={this.state.activeList} tasks={this.state.tasks}/>
+        <Tasks activeList={this.state.activeList} tasks={this.state.tasks}/>
       </div>
     );
   }
 }
 
-export default Home
+export default Tabs

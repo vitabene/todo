@@ -6,7 +6,7 @@ class App extends React.Component {
     return (
       <div className="wrapper">
         <NavBar />
-        <div className="taskboard" id="taskboard">
+        <div className="content">
           {this.props.children}
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
-import actions from '../actions'
-import CancelSaveButtons from './CancelSaveButtons'
+import actions from '../../actions'
+import CancelSaveButtons from '../elements/CancelSaveButtons'
 
 const defaultList = {
   title: "Untitled List",
@@ -37,7 +37,7 @@ class ListForm extends React.Component {
   }
   render () {
     return (
-      <div className="list-form">
+      <div className="form">
         <input className="task__title"
           placeholder={defaultList.title}
           type="text"

@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import actions from '../actions'
+import actions from '../../actions'
 
 class List extends React.Component {
   constructor() {
@@ -19,12 +19,12 @@ class List extends React.Component {
   }
   render() {
     let a = this.props.active ? "active" : "";
-    let listClass = "list " + a;
+    let listClass = "list-bar__item " + a;
     return (
       <li className={listClass} onClick={this.activate}>
-        <span className="list__title">{this.props.list.title}</span>
-        <span className="list__desc">{this.props.list.desc}</span>
-        <button className="list__del" onClick={this.deleteList}>X</button>
+        <span className="list-bar__item__title">{this.props.list.title}</span>
+        <span className="list-bar__item__desc">{this.props.list.desc}</span>
+        <button className="list-bar__item__del" onClick={this.deleteList}>X</button>
       </li>
     );
   }

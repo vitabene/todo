@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react'
 import TaskForm from './TaskForm'
-import actions from '../actions'
+import actions from '../../actions'
 import {Link} from 'react-router'
 
 const newTask = {
@@ -9,7 +9,7 @@ const newTask = {
   desc: "Edit Me!"
 };
 
-class TaskList extends React.Component {
+class Tasks extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -62,6 +62,7 @@ class TaskList extends React.Component {
     // adding tasks
     var emptyListBool = tasks.length === 0 && this.props.activeList !== 0;
     if (emptyListBool || this.state.addingTask) {
+      if (emptyListBool) tasks.push(<h3>There are no tasks. Add a new one!</h3>)
       tasks.push(<TaskForm createTask={this.createTask}
                         task={newTask}
                         taskAdded={this.taskAdded}
@@ -70,15 +71,16 @@ class TaskList extends React.Component {
       addTaskButton = (<li></li>);
     }
     return (
-      <div className="task-list">
+      <div className="task">
         <div className="task-filters">
+          <input onClick={this.setFilter} name="2"
+                type="button" value="Show All"/>
           <input onClick={this.setFilter} name="1"
                 type="button" value="Show Complete"/>
           <input onClick={this.setFilter} name="0"
                 type="button" value="Show Incomplete"/>
-          <input onClick={this.setFilter} name="2"
-                type="button" value="Show All"/>
         </div>
+        <h2>All Tasks</h2>
         <ul className="task-list" id="taskList">
           {tasks}
           {addTaskButton}
@@ -88,4 +90,4 @@ class TaskList extends React.Component {
   }
 }
 
-export default TaskList
+export default Tasks

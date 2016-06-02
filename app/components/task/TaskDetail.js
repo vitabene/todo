@@ -1,11 +1,12 @@
 import React from 'react'
-import ListStore from '../stores/listStore'
-import TaskStore from '../stores/taskStore'
-import actions from '../actions'
+import ListStore from '../../stores/listStore'
+import TaskStore from '../../stores/taskStore'
+import actions from '../../actions'
 import {Link} from 'react-router'
-import EditDeleteButtons from './EditDeleteButtons'
-import CancelSaveButtons from './CancelSaveButtons'
-import CheckBox from './CheckBox'
+import EditDeleteButtons from '../elements/EditDeleteButtons'
+import CancelSaveButtons from '../elements/CancelSaveButtons'
+import CheckBox from '../elements/CheckBox'
+import {browserHistory} from 'react-router'
 
 class TaskDetail extends React.Component {
   constructor() {
@@ -21,6 +22,7 @@ class TaskDetail extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.complete = this.complete.bind(this);
     this.edit = this.edit.bind(this);
+    this.deleteTask = this.deleteTask.bind(this);
     this.cancelEdit = this.cancelEdit.bind(this);
     this.completeEdit = this.completeEdit.bind(this);
   }
@@ -33,7 +35,9 @@ class TaskDetail extends React.Component {
     });
   }
   deleteTask() {
-    actions.deleteTask(this.state.tast._id);
+    if(!confirm('Are you sure you want to delete this item?')) return false;
+    actions.deleteTask(this.state.task._id);
+    browserHistory.push('/tabs');
   }
   handleChange(e) {
     if (e.target.name === "title")
@@ -45,7 +49,7 @@ class TaskDetail extends React.Component {
         desc: e.target.value
       });
     }
-    else if (e.target.className === "list") {
+    else if (e.target.className === "checkbox") {
       if (e.target.checked) {
         let eL = this.state.editLists.slice();
         eL.push(e.target.id);
@@ -109,7 +113,7 @@ class TaskDetail extends React.Component {
     let taskTitle = this.state.task.title ? this.state.task.title : '';
     let taskDesc = this.state.task.desc ? this.state.task.desc : '';
     var buttons = (
-      <EditDeleteButtons edit={this.edit} delete={this.delete}/>
+      <EditDeleteButtons edit={this.edit} delete={this.deleteTask}/>
     );
 
     let lists = [];
@@ -130,9 +134,9 @@ class TaskDetail extends React.Component {
       let list = st.allLists[i];
       let listAssigned = srcLists.indexOf(list._id) !== -1 ? true : false;
       lists.push(
-        <li className="task" key={list._id}>
+        <li className="list" key={list._id}>
           <input type="checkbox" disabled={!this.state.edited}
-                  className='task__checkbox' id={list._id} checked={listAssigned}
+                  className='checkbox' id={list._id} checked={listAssigned}
                   onChange={this.handleChange}/>
           <span>{list.title}</span>
           <Link className="list-detail-link" to={`/list/${list._id}`}>Detail</Link>

@@ -1,7 +1,8 @@
 $darkGrey: #1a1818;
 $red: rgb(255, 77, 43);
 $defFont: 'Ubuntu', serif;
-$green: #09be00;
+$green: #4FB753;
+$contentBackground: rgba(255, 255, 255, .7);
 
 html, body {
   width: 100%;
@@ -11,7 +12,7 @@ html, body {
   padding: 0;
   font-family: $defFont;
   background-color: #201f1f;
-  background: url("http://subtlepatterns2015.subtlepatterns.netdna-cdn.com/patterns/binding_dark.png");
+  background: url("http://subtlepatterns2015.subtlepatterns.netdna-cdn.com/patterns/congruent_pentagon.png");
 }
 
 a {
@@ -19,69 +20,43 @@ a {
   color: #000;
 }
 
+h2, h3 {
+  text-indent: 20px;
+}
+
+@import "buttons";
+@import "nav-bar";
+
 .wrapper {
   width: 50%;
-  margin: 0;
   margin-left: 25%;
   position: relative;
 }
-%button {
-  cursor: pointer;
-  color: #f2f2f2;
-  outline: 0;
-  border: 0;
-  background-color: rgba(#fff, .2);
-  vertical-align: bottom;
-}
-.nav-bar {
-  padding-left: 0;
-  list-style: none;
-  height: 45px;
-  margin-bottom: 3px;
-  border-bottom: 1px solid transparent;
-  li {
-    background-color: rgba($darkGrey, 0.7);
-    text-align: center;
-    display: inline-block;
-    vertical-align: bottom;
-    height: 45px;
-    width: 140px;
-    font-size: large;
-    line-height: 35px;
-    margin-right: 2px;
-    a {
-      padding: 5px 10px;
-      display: block;
-      color: #fff;
-      &:hover {
-        background-color: rgba($darkGrey, 0.9);
-      }
-    }
-  }
-}
 
-.taskboard {
+.content {
   position: relative;
-  background-color: #fff;
+  background-color: $contentBackground;
   min-height: 300px;
   overflow: auto;
 }
 
-.list-bar-list {
+.form {
+  padding: 10px;
+  background: rgba(darkslategrey, .6);
+}
+
+.list-bar {
   padding-left: 0;
   margin: 0;
   position: relative;
   list-style: none;
   height: 55px;
-  border-bottom: 1px solid #555;
-  background-color: $darkGrey;
-  & .list {
+  background-color: rgba(darkslategrey, .6);
+  &__item {
     padding: 5px 10px;
     display: inline-block;
     cursor: pointer;
-    color: #f2f2f2;
     position: relative;
-    background-color: rgba(#fff, .2);
     vertical-align: bottom;
     height: 45px;
     width: 140px;
@@ -95,24 +70,25 @@ a {
       background-color: transparent;
     }
     &.active {
-      background-color: $darkGrey;
+      background-color: $green;
+      color: #fff;
     }
     &__title {
       display: block;
+      font-weight: bold;
     }
     &__desc {
       display: block;
       font-size: small;
       font-style: italic;
-      color: #999;
     }
     &__del {
       background: transparent;
       border: none;
-      color: white;
       font-weight: 800;
       font-size: large;
       position: absolute;
+      color: #000;
       float: left;
       top: 0;
       right: 0;
@@ -122,48 +98,47 @@ a {
       &:hover {
         color: $red;
       }
+      &.active {
+        color: #fff;
+      }
     }
   }
 }
 
-.task-list, .task-lists {
+.task-filters {
+  overflow: auto;
+  width: 100%;
+  input {
+    background-color: rgba(0, 0, 0, .5);
+    float: left;
+    width: 33.333%;
+    outline: 0;
+    font-family: $defFont;
+    height: 30px;
+    border: 0;
+    cursor: pointer;
+    color: #f2f2f2;
+    vertical-align: bottom;
+  }
+}
+
+ul {
   padding-left: 0;
   margin: 0;
   position: relative;
   list-style: none;
-  background-color: #fff;
-  & .task-filters {
-    background-color: rgba($darkGrey, .7);
-    overflow: auto;
-    width: 100%;
-    input {
-      float: left;
-      width: 33.333%;
-      outline: 0;
-      font-family: $defFont;
-      height: 30px;
-      border: 0;
-      cursor: pointer;
-      background-color: rgba(#fff, .2);
-      color: #f2f2f2;
-      vertical-align: bottom;
-    }
-  }
   & .task, & .list {
     position: relative;
-		height: 40px;
     text-indent: 10px;
-    line-height: 35px;
-    span {
-      height: 40px;
-      text-indent: 10px;
-      line-height: 35px;
-    }
-    a {
-      text-decoration: underline;
-    }
+    overflow: hidden;
+    padding: 10px;
     .list-detail-link {
       float: right;
+    }
+    span {
+      line-height: 40px;
+      height: 40px;
+      margin-left: 10px;
     }
     &.add {
       width: 6.5%;
@@ -173,45 +148,31 @@ a {
       cursor: pointer;
       line-height: 18px;
       color: #858585;
+      min-height: 35px;
       text-align: center;
     }
   }
+  & .list.add {
+    float: right;
+    color: #000;
+  }
+}
+.task {
+  &__title, &__desc {
+    border: 0;
+    outline: 0;
+    background-color: #f9f9f9;
+    text-indent: 10px;
+    font-family: $defFont;
+    height: 38px;
+    margin-left: 5px;
+  }
 }
 
-.task__buttons {
-  float: right;
-  background-color: $darkGrey;
-  margin-left: 0;
-  overflow: hidden;
-  width: 150px;
-  color: #fff;
-  text-indent: 0;
-  button {
-    @extend %button;
-    width: 75px;
-    padding: 12px;
-  }
-  .save-button {
-    background-color: $green;
-  }
-  .cancel-button, .delete-button {
-    background-color: $red;
-  }
-}
-.task__checkbox {
+.checkbox {
   height: 35px;
   width: 35px;
   vertical-align: bottom;
-}
-
-.task__title, .task__desc {
-  border: 0;
-  outline: 0;
-  background-color: #f9f9f9;
-  text-indent: 10px;
-  font-family: $defFont;
-  height: 38px;
-  margin-left: 5px;
 }
 
 .list-detail {
@@ -227,10 +188,13 @@ a {
   }
 }
 
-.list-form {
+.tasks {
+  position: relative;
+}
+.task-detail {
   padding: 10px;
 }
 
-.task-detail {
-  padding: 10px;
+.welcome {
+  text-align: center;
 }

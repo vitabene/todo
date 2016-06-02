@@ -1,5 +1,5 @@
 import Dispatcher from './dispatcher'
-var constants = require('./constants');
+import constants from './constants'
 
 // generating functions for actions
 Object.keys(constants).forEach(function(key) {

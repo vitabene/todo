@@ -24,27 +24,26 @@ class ListBar extends React.Component {
   }
   render () {
     let lists = [],
-        listActive = false;
+        active = false,
+        activeList = this.props.activeList,
+        updateFn = this.props.updateList,
+        setActive = this.props.setActive;
     if (typeof this.props.lists != "undefined") {
-      for (let i = 0; i < this.props.lists.length; i++) {
-        let list = this.props.lists[i];
-        if (this.props.activeList === i || this.props.activeList === list._id) {
-          listActive = true;
-        }
-        lists.push(<ListBarItem update={this.props.updateList}
+      this.props.lists.forEach(function(list){
+        if (activeList === 0 || activeList === list._id) active = true;
+        lists.push(<ListBarItem update={updateFn}
                           list={list}
-                          active={listActive}
-                          setActive={this.props.setActive}
+                          active={active}
+                          setActive={setActive}
                           key={list._id}/>);
-        listActive = false;
-      };
+        active = false;
+      });
     }
-    let form = '';
-    if (this.state.showForm) form = <ListForm detach={this.detachForm} />
+    let form = this.state.showForm ? <ListForm detach={this.detachForm} /> : "";
     return (
-      <div className="list-bar">
+      <div className="tabs">
         {form}
-        <ul className="list-bar-list" id="listBar">
+        <ul className="list-bar" id="listBar">
           {lists}
           <li className="list add" id="addList" onClick={this.attachForm}>+</li>
         </ul>

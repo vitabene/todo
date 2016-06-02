@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
-import EditDeleteButtons from './EditDeleteButtons'
-import CancelSaveButtons from './CancelSaveButtons'
-import CheckBox from './CheckBox'
+import EditDeleteButtons from '../elements/EditDeleteButtons'
+import CancelSaveButtons from '../elements/CancelSaveButtons'
+import CheckBox from '../elements/CheckBox'
 
 class TaskForm extends React.Component {
   constructor() {
@@ -57,8 +57,7 @@ class TaskForm extends React.Component {
     let checked = false;
     if (this.state.completed == 1) checked = true;
     return (
-      <li className="task">
-        <CheckBox checked={checked} click={this.complete}/>
+      <li className="form">
         <input className="task__title"
               name="title"
               onChange={this.handleChange}

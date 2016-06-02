@@ -1,0 +1,2 @@
+body:before{white-space:pre;font-family:monospace;content:"Error: Undefined variable: \"$darkGrey\".\A         on line 8 of styles/nav-bar.scss\A \A 3:   list-style: none;\A 4:   height: 45px;\A 5:   margin-bottom: 3px;\A 6:   border-bottom: 1px solid transparent;\A 7:   li {\A 8:     background-color: rgba($darkGrey, 0.7);\A 9:     text-align: center;\A 10:     display: inline-block;\A 11:     vertical-align: bottom;\A 12:     height: 45px;\A 13:     width: 140px;"}
+/*# sourceMappingURL=maps/nav-bar.css.map */

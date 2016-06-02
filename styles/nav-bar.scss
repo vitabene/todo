@@ -1,0 +1,26 @@
+.nav-bar {
+  padding-left: 0;
+  list-style: none;
+  height: 45px;
+  margin-bottom: 3px;
+  border-bottom: 1px solid transparent;
+  li {
+    background-color: rgba($darkGrey, 0.7);
+    text-align: center;
+    display: inline-block;
+    vertical-align: bottom;
+    height: 45px;
+    width: 140px;
+    font-size: large;
+    line-height: 35px;
+    margin-right: 2px;
+    a {
+      padding: 5px 10px;
+      display: block;
+      color: #fff;
+      &:hover {
+        background-color: rgba($darkGrey, 0.9);
+      }
+    }
+  }
+}

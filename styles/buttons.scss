@@ -1,0 +1,31 @@
+.button {
+  cursor: pointer;
+  color: #f2f2f2;
+  outline: 0;
+  border: 0;
+  background-color: rgba(0,0,0,.5);
+  vertical-align: bottom;
+  width: 75px;
+  font-family: 'Ubuntu';
+  font-weight: bold;
+  letter-spacing: 1px;
+  padding: 12px;
+  &__save {
+    @extend .button;
+    background-color: $green;
+  }
+  &__edit {
+    @extend .button;
+  }
+  &__cancel,
+  &__delete {
+    @extend .button;
+    background-color: $red;
+  }
+}
+.button-box {
+  float: right;
+  margin-left: 0;
+  overflow: hidden;
+  width: 150px;
+}
